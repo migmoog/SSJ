@@ -3,22 +3,81 @@ import Scene from "./scenes/Scene.js";
 class P extends Phaser.Scene {
     preload() {
         /**@type {Phaser.Types.Loader.FileTypes.ImageFrameConfig} */
-        const spriteConfig = { frameWidth: 32, frameHeight: 32 };
+        const familyConfig = { frameWidth: 32, frameHeight: 32 };
+        /**@type {Phaser.Types.Loader.FileTypes.ImageFrameConfig} */
+        const petConfig = { frameWidth: 16, frameHeight: 16 };
 
         this.load.image('bg', 'assets/images/bg.png');
-        this.load.spritesheet('p1-1', 'assets/images/p1-1.png', spriteConfig);
-        this.load.spritesheet('p2-1', 'assets/images/p2-1.png', spriteConfig)
+
+        // TODO finish family anims
+        this.load.spritesheet('p1-0', 'assets/images/p1-0.png', familyConfig);
+        this.load.spritesheet('p1-1', 'assets/images/p1-1.png', familyConfig);
+        this.load.spritesheet('p1-2', 'assets/images/p1-2.png', familyConfig);
+        this.load.spritesheet('p1-3', 'assets/images/p1-3.png', familyConfig);
+        
+        this.load.spritesheet('p2-0', 'assets/images/p2-0.png', familyConfig);
+        this.load.spritesheet('p2-1', 'assets/images/p2-1.png', familyConfig);
+        this.load.spritesheet('p2-2', 'assets/images/p2-2.png', familyConfig);
+        this.load.spritesheet('p2-3', 'assets/images/p2-3.png', familyConfig);
+
+        this.load.spritesheet('cat', 'assets/images/cat.png', petConfig);
+        this.load.spritesheet('dog', 'assets/images/dog.png', petConfig);
+        this.load.spritesheet('snowpile', 'assets/images/snowpile.png', { frameWidth: 16, frameHeight: 32 });
     }
 
     create() {
+        const bounceConfig = { start: 0, end: 2 };
+        this.anims.create({
+            key: 'bounce-p1-0',
+            frames: this.anims.generateFrameNumbers('p1-0', bounceConfig),
+            frameRate: 4
+        });
         this.anims.create({
             key: 'bounce-p1-1',
-            frames: this.anims.generateFrameNumbers('p1-1', { start: 0, end: 1 }),
+            frames: this.anims.generateFrameNumbers('p1-1', bounceConfig),
+            frameRate: 4
+        });
+        this.anims.create({
+            key: 'bounce-p1-2',
+            frames: this.anims.generateFrameNumbers('p1-2', bounceConfig),
+            frameRate: 4
+        });
+        this.anims.create({
+            key: 'bounce-p1-3',
+            frames: this.anims.generateFrameNumbers('p1-3', bounceConfig),
+            frameRate: 4
+        });
+        
+        this.anims.create({
+            key: 'bounce-p2-0',
+            frames: this.anims.generateFrameNumbers('p2-0', bounceConfig),
             frameRate: 4
         });
         this.anims.create({
             key: 'bounce-p2-1',
-            frames: this.anims.generateFrameNumbers('p2-1', { start: 0, end: 1 }),
+            frames: this.anims.generateFrameNumbers('p2-1', bounceConfig),
+            frameRate: 4
+        });
+        this.anims.create({
+            key: 'bounce-p2-2',
+            frames: this.anims.generateFrameNumbers('p2-2', bounceConfig),
+            frameRate: 4
+        });
+        this.anims.create({
+            key: 'bounce-p2-3',
+            frames: this.anims.generateFrameNumbers('p2-3', bounceConfig),
+            frameRate: 4
+        });
+
+        // TODO finish pet anims
+        this.anims.create({
+            key: 'idle-cat',
+            frames: this.anims.generateFrameNumbers('cat', { start: 0, end: 1 }),
+            frameRate: 4
+        });
+        this.anims.create({
+            key: 'idle-dog',
+            frames: this.anims.generateFrameNumbers('dog', { start: 0, end: 1 }),
             frameRate: 4
         });
 
