@@ -10,15 +10,12 @@ class P extends Phaser.Scene {
         this.load.image('bg', 'assets/images/bg.png');
 
         // TODO finish family anims
-        this.load.spritesheet('p1-0', 'assets/images/p1-0.png', familyConfig);
-        this.load.spritesheet('p1-1', 'assets/images/p1-1.png', familyConfig);
-        this.load.spritesheet('p1-2', 'assets/images/p1-2.png', familyConfig);
-        this.load.spritesheet('p1-3', 'assets/images/p1-3.png', familyConfig);
-        
-        this.load.spritesheet('p2-0', 'assets/images/p2-0.png', familyConfig);
-        this.load.spritesheet('p2-1', 'assets/images/p2-1.png', familyConfig);
-        this.load.spritesheet('p2-2', 'assets/images/p2-2.png', familyConfig);
-        this.load.spritesheet('p2-3', 'assets/images/p2-3.png', familyConfig);
+        for (let i = 0; i < 4; i++) {
+            let ixs = i.toString();
+            
+            this.load.spritesheet('p1-' + ixs, 'assets/images/p1-' + ixs + '.png', familyConfig);
+            this.load.spritesheet('p2-' + ixs, 'assets/images/p2-' + ixs + '.png', familyConfig);
+        }
 
         this.load.spritesheet('cat', 'assets/images/cat.png', petConfig);
         this.load.spritesheet('dog', 'assets/images/dog.png', petConfig);
@@ -47,7 +44,7 @@ class P extends Phaser.Scene {
             frames: this.anims.generateFrameNumbers('p1-3', bounceConfig),
             frameRate: 4
         });
-        
+
         this.anims.create({
             key: 'bounce-p2-0',
             frames: this.anims.generateFrameNumbers('p2-0', bounceConfig),
