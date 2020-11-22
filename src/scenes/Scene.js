@@ -20,7 +20,7 @@ export default class Scene extends Phaser.Scene {
         this.player1 = new Family(this, 70, 40, 'p1-', 'cat', 120);
         this.player2 = new Family(this, 250, 40, 'p2-', 'dog', 200);
 
-        this.time.delayedCall(1500, () => {
+        this.time.delayedCall(500, () => {
             this.p1Btns = new TBGbtns(this);
         });
     }

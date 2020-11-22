@@ -28,6 +28,9 @@ export default class Family extends Phaser.GameObjects.Group {
 }
 
 class FamilyMember extends Phaser.GameObjects.Sprite {
+    /**@type {number} */
+    health = 6;
+    
     constructor(scene, x, y, texture) {
         super(scene, x, y, texture);
     }
