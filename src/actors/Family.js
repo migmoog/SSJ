@@ -58,6 +58,9 @@ class Pet extends Phaser.GameObjects.Sprite {
 }
 
 class SnowPile extends Phaser.GameObjects.Sprite {
+    /**@type {number} */
+    height = 0;
+    
     /**
      * @param {Phaser.Scene} scene 
      * @param {number} x 

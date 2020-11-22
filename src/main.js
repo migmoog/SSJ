@@ -2,69 +2,41 @@ import Scene from "./scenes/Scene.js";
 
 class P extends Phaser.Scene {
     preload() {
-        /**@type {Phaser.Types.Loader.FileTypes.ImageFrameConfig} */
-        const familyConfig = { frameWidth: 32, frameHeight: 32 };
-        /**@type {Phaser.Types.Loader.FileTypes.ImageFrameConfig} */
-        const petConfig = { frameWidth: 16, frameHeight: 16 };
-
         this.load.image('bg', 'assets/images/bg.png');
 
-        // TODO finish family anims
         for (let i = 0; i < 4; i++) {
-            let ixs = i.toString();
-            
+            const familyConfig = { frameWidth: 32, frameHeight: 32 };
+            const ixs = i.toString();
+
             this.load.spritesheet('p1-' + ixs, 'assets/images/p1-' + ixs + '.png', familyConfig);
             this.load.spritesheet('p2-' + ixs, 'assets/images/p2-' + ixs + '.png', familyConfig);
         }
 
+        const petConfig = { frameWidth: 16, frameHeight: 16 };
         this.load.spritesheet('cat', 'assets/images/cat.png', petConfig);
         this.load.spritesheet('dog', 'assets/images/dog.png', petConfig);
         this.load.spritesheet('snowpile', 'assets/images/snowpile.png', { frameWidth: 16, frameHeight: 32 });
+
+        //UI preloads
+        this.load.spritesheet('p1-btn', 'assets/images/p1-btn.png', { frameWidth: 48, frameHeight: 16 });
     }
 
     create() {
-        const bounceConfig = { start: 0, end: 2 };
-        this.anims.create({
-            key: 'bounce-p1-0',
-            frames: this.anims.generateFrameNumbers('p1-0', bounceConfig),
-            frameRate: 4
-        });
-        this.anims.create({
-            key: 'bounce-p1-1',
-            frames: this.anims.generateFrameNumbers('p1-1', bounceConfig),
-            frameRate: 4
-        });
-        this.anims.create({
-            key: 'bounce-p1-2',
-            frames: this.anims.generateFrameNumbers('p1-2', bounceConfig),
-            frameRate: 4
-        });
-        this.anims.create({
-            key: 'bounce-p1-3',
-            frames: this.anims.generateFrameNumbers('p1-3', bounceConfig),
-            frameRate: 4
-        });
+        for (let i = 0; i < 4; i++) {
+            const bounceConfig = { start: 0, end: 2 };
+            const ixs = i.toString();
 
-        this.anims.create({
-            key: 'bounce-p2-0',
-            frames: this.anims.generateFrameNumbers('p2-0', bounceConfig),
-            frameRate: 4
-        });
-        this.anims.create({
-            key: 'bounce-p2-1',
-            frames: this.anims.generateFrameNumbers('p2-1', bounceConfig),
-            frameRate: 4
-        });
-        this.anims.create({
-            key: 'bounce-p2-2',
-            frames: this.anims.generateFrameNumbers('p2-2', bounceConfig),
-            frameRate: 4
-        });
-        this.anims.create({
-            key: 'bounce-p2-3',
-            frames: this.anims.generateFrameNumbers('p2-3', bounceConfig),
-            frameRate: 4
-        });
+            this.anims.create({
+                key: 'bounce-p1-' + ixs,
+                frames: this.anims.generateFrameNumbers('p1-' + ixs, bounceConfig),
+                frameRate: 4
+            });
+            this.anims.create({
+                key: 'bounce-p2-' + ixs,
+                frames: this.anims.generateFrameNumbers('p2-' + ixs, bounceConfig),
+                frameRate: 4
+            });
+        }
 
         // TODO finish pet anims
         this.anims.create({
