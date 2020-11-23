@@ -4,6 +4,7 @@ class P extends Phaser.Scene {
     preload() {
         this.load.image('bg', 'assets/images/bg.png');
 
+        // Family preloads
         for (let i = 0; i < 4; i++) {
             const familyConfig = { frameWidth: 32, frameHeight: 32 };
             const s = i.toString();
@@ -16,10 +17,13 @@ class P extends Phaser.Scene {
         const petConfig = { frameWidth: 16, frameHeight: 16 };
         this.load.spritesheet('cat', 'assets/images/cat.png', petConfig);
         this.load.spritesheet('dog', 'assets/images/dog.png', petConfig);
+        
+        // Snow preloads
         this.load.spritesheet('wall', 'assets/images/wall.png', { frameWidth: 16, frameHeight: 32 });
 
         // UI preloads
         this.load.spritesheet('p1-btn', 'assets/images/p1-btn.png', { frameWidth: 48, frameHeight: 16 });
+        this.load.spritesheet('p2-btn', 'assets/images/p2-btn.png', { frameWidth: 48, frameHeight: 16 });
 
         // Audio and Music preloads
         this.load.audio('battle theme', ['assets/music/battletheme.mp3']);
@@ -30,6 +34,7 @@ class P extends Phaser.Scene {
     }
 
     create() {
+        // Family animations
         for (let i = 0; i < 4; i++) {
             const bounceConfig = { start: 0, end: 2 };
             const s = i.toString();

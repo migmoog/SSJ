@@ -1,24 +1,28 @@
-// TODO add Throw, Build, and Gather Commands
 export default class TBGbtns extends Phaser.GameObjects.Group {
     /**@type {string} */
     action;
+    /**@type {string} */
+    buttonKey
     /**@type {Family} */
     family;
 
     /**
      * @param {Phaser.Scene} scn
-     * @param {Family} fam
+     * @param {Family} fam the family object it should assign actions to
+     * @param {string} whichFam 1st or 2nd family, will assign the corresponding keys
      */
-    constructor(scn, fam) {
+    constructor(scn, fam, whichFam) {
         super(scn);
         this.family = fam;
+
+        this.buttonKey = whichFam;
     }
 
     makeButtons() {
         this.addMultiple([
-            new Btn(this.scene, this, this.family, this.scene.scale.width / 2, 196, 'p1-btn', 0),
-            new Btn(this.scene, this, this.family, this.scene.scale.width / 2, 196, 'p1-btn', 2),
-            new Btn(this.scene, this, this.family, this.scene.scale.width / 2, 196, 'p1-btn', 4)
+            new Btn(this.scene, this, this.family, this.scene.scale.width / 2, 196, this.buttonKey, 0),
+            new Btn(this.scene, this, this.family, this.scene.scale.width / 2, 196, this.buttonKey, 2),
+            new Btn(this.scene, this, this.family, this.scene.scale.width / 2, 196, this.buttonKey, 4)
         ], true);
 
         for (let i = 0; i < 3; i++)
@@ -43,6 +47,8 @@ class Btn extends Phaser.GameObjects.Image {
     action;
     /**@type {boolean} */
     returnAction = false;
+    /**@type {Phaser.Sound.BaseSound} */
+    sound;
 
     /**
      * @param {Phaser.Scene} scn
@@ -65,11 +71,12 @@ class Btn extends Phaser.GameObjects.Image {
 
         this.group = grp;
         this.family = fam;
+        this.sound = scn.sound.add('hoverbtn');
 
         this.setInteractive()
             .on('pointerover', () => {
                 this.setFrame(this.returnHighlight(frame));
-                scn.sound.play('hoverbtn');
+                this.sound.play();
             })
             .on('pointerout', () => {
                 this.setFrame(frame);
@@ -77,6 +84,7 @@ class Btn extends Phaser.GameObjects.Image {
             .on('pointerdown', () => {
                 scn.sound.play('confirm');
                 this.group.children.iterate((e, ix) => {
+                    e.sound.destroy();
                     scn.add.tween({
                         duration: 500,
                         ease: Phaser.Math.Easing.Quadratic.InOut,

@@ -2,9 +2,9 @@ export default class Family extends Phaser.GameObjects.Group {
     /**@type {boolean} */
     isTurn;
     /**@type {TBGbtns} */
-    btns
+    btns;
     /**@type {string} */
-    action
+    action;
 
     /**
      * @param {Phaser.Scene} scene 
@@ -24,7 +24,7 @@ export default class Family extends Phaser.GameObjects.Group {
         for (let i = 0; i < 4; i++)
             this.addMultiple([
                 new FamilyMember(scene, x, y + (i * 35), texture + i.toString()),
-                new Wall(scene, x == 70 ? x + 30 : x - 30, y + (i * 35))
+                new Wall(scene, x <= 70 ? x + 30 : x - 30, y + (i * 35))
             ], true);
 
         this.add(new Pet(scene, petX, 95, petTexture), true);
@@ -32,6 +32,25 @@ export default class Family extends Phaser.GameObjects.Group {
 
     preUpdate(t, dt) {
         super.preUpdate(t, dt);
+    }
+}
+
+export class AIfamily extends Family {
+    /**@type {boolean} */
+    isTurn;
+    /**@type {TBGbtns} */
+    btns;
+    /**@type {string} */
+    action;
+
+    constructor(scene, x, y, texture, petTexture, petX, isTurn) {
+        super(scene, x, y, texture, petTexture, petX, isTurn);
+
+        this.isTurn = isTurn
+    }
+
+    preUpdate(t, dt) {
+
     }
 }
 
