@@ -2,19 +2,23 @@
 export default class TBGbtns extends Phaser.GameObjects.Group {
     /**@type {string} */
     action;
+    /**@type {Family} */
+    family;
 
-    /**@param {Phaser.Scene} scn*/
-    constructor(scn) {
+    /**
+     * @param {Phaser.Scene} scn
+     * @param {Family} fam
+     */
+    constructor(scn, fam) {
         super(scn);
-
-        this.makeButtons();
+        this.family = fam;
     }
 
     makeButtons() {
         this.addMultiple([
-            new Btn(this.scene, this, this.scene.scale.width / 2, 196, 'p1-btn', 0),
-            new Btn(this.scene, this, this.scene.scale.width / 2, 196, 'p1-btn', 2),
-            new Btn(this.scene, this, this.scene.scale.width / 2, 196, 'p1-btn', 4)
+            new Btn(this.scene, this, this.family, this.scene.scale.width / 2, 196, 'p1-btn', 0),
+            new Btn(this.scene, this, this.family, this.scene.scale.width / 2, 196, 'p1-btn', 2),
+            new Btn(this.scene, this, this.family, this.scene.scale.width / 2, 196, 'p1-btn', 4)
         ], true);
 
         for (let i = 0; i < 3; i++)
@@ -30,22 +34,26 @@ export default class TBGbtns extends Phaser.GameObjects.Group {
     }
 }
 
-class Btn extends Phaser.GameObjects.Sprite {
+class Btn extends Phaser.GameObjects.Image {
     /**@type {TBGbtns} */
     group;
+    /**@type {Family} */
+    family;
     /**@type {string} */
     action;
     /**@type {boolean} */
     returnAction = false;
 
     /**
-     * @param {Phaser.Scene} scn 
+     * @param {Phaser.Scene} scn
+     * @param {TBGbtns} grp
+     * @param {Family} fam
      * @param {number} x 
      * @param {number} y 
      * @param {string} texture 
      * @param {number} frame 
      */
-    constructor(scn, grp, x, y, texture, frame) {
+    constructor(scn, grp, fam, x, y, texture, frame) {
         super(scn, x, y, texture, frame);
 
         if (frame === 0)
@@ -56,15 +64,18 @@ class Btn extends Phaser.GameObjects.Sprite {
             this.action = 'gather';
 
         this.group = grp;
+        this.family = fam;
 
         this.setInteractive()
             .on('pointerover', () => {
                 this.setFrame(this.returnHighlight(frame));
+                scn.sound.play('hoverbtn');
             })
             .on('pointerout', () => {
                 this.setFrame(frame);
             })
             .on('pointerdown', () => {
+                scn.sound.play('confirm');
                 this.group.children.iterate((e, ix) => {
                     scn.add.tween({
                         duration: 500,
@@ -78,8 +89,11 @@ class Btn extends Phaser.GameObjects.Sprite {
                 });
 
                 this.group.action = this.action;
+                this.family.action = this.action;
+
                 //DEBUG
-                console.log(this.group.action);
+                console.log("Group action: " + this.group.action);
+                console.log("Family action: " + this.family.action);
             });
 
         scn.add.existing(this);
@@ -97,7 +111,6 @@ class Btn extends Phaser.GameObjects.Sprite {
         }
     }
 
-    preUpdate(t, dt) {
-        super.preUpdate(t, dt);
+    preUpdate() {
     }
 }

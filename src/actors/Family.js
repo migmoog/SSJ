@@ -1,6 +1,10 @@
 export default class Family extends Phaser.GameObjects.Group {
     /**@type {boolean} */
     isTurn;
+    /**@type {TBGbtns} */
+    btns
+    /**@type {string} */
+    action
 
     /**
      * @param {Phaser.Scene} scene 
@@ -8,15 +12,19 @@ export default class Family extends Phaser.GameObjects.Group {
      * @param {number} y
      * @param {string} texture
      * @param {string} petTexture
-     * @param {number} petX 
+     * @param {number} petX
+     * @param {boolean} isTurn 
+     * @param {TBGbtns} btns
      */
-    constructor(scene, x, y, texture, petTexture, petX) {
+    constructor(scene, x, y, texture, petTexture, petX, isTurn) {
         super(scene);
+
+        this.isTurn = isTurn;
 
         for (let i = 0; i < 4; i++)
             this.addMultiple([
                 new FamilyMember(scene, x, y + (i * 35), texture + i.toString()),
-                new SnowPile(scene, x == 70 ? x + 30 : x - 30, y + (i * 35))
+                new Wall(scene, x == 70 ? x + 30 : x - 30, y + (i * 35))
             ], true);
 
         this.add(new Pet(scene, petX, 95, petTexture), true);
@@ -30,7 +38,7 @@ export default class Family extends Phaser.GameObjects.Group {
 class FamilyMember extends Phaser.GameObjects.Sprite {
     /**@type {number} */
     health = 6;
-    
+
     constructor(scene, x, y, texture) {
         super(scene, x, y, texture);
     }
@@ -60,20 +68,30 @@ class Pet extends Phaser.GameObjects.Sprite {
     }
 }
 
-class SnowPile extends Phaser.GameObjects.Sprite {
+class Wall extends Phaser.GameObjects.Image {
     /**@type {number} */
     height = 0;
-    
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {number} x 
      * @param {number} y 
      */
     constructor(scene, x, y) {
-        super(scene, x, y, 'snowpile', 0);
+        super(scene, x, y, 'wall', 0);
     }
 
-    preUpdate(t, dt) {
-        super.preUpdate(t, dt);
+    preUpdate() {
+    }
+}
+
+class SnowPile extends Phaser.GameObjects.Image {
+    /**
+     * @param {Phaser.Scene} scn 
+     * @param {number} x 
+     * @param {number} y 
+     */
+    constructor(scn, x, y) {
+        super(scn, x, y, 'snowpile');
     }
 }
