@@ -37,44 +37,42 @@ export class Family extends Phaser.GameObjects.Group {
     throwAction() {
         //DEBUG
         console.log('called throw method');
-        this.action = undefined;
     }
 
     buildAction() {
-        let catBuild = false;
+        const cat = this.children.entries[8];
 
         this.children.iterate((e, ix) => {
-            if (!(ix % 2 === 0)) {
+            if (!(ix % 2 === 0))
                 e.setInteractive()
-                    .on('pointerover', () => { e.arrow = this.scene.add.image(e.x, e.y, 'arrow'); })
-                    .on('pointerout', () => { e.arrow.setVisible(false); })
-                    .on('pointerdown', () => {
+                    .on('pointerover', function () {
+                        this.setTint(0x5ee9e9);
+                    })
+                    .on('pointerout', function () {
+                        this.clearTint();
+                    })
+                    .on('pointerdown', function () {
                         this.scene.sound.play('confirm');
-                        e.arrow.destroy();
 
-                        this.children.iterate((e, ix) => {
-                            e.disableInteractive();
+                        this.family.children.iterate((e, ix) => {
+                            if (!(ix % 2 === 0))
+                                e.disableInteractive();
+                        });
+                        cat.setAnimToPlay(`build-${cat.texture.key}`);
+                        this.scene.time.delayedCall(1500, () => {
+                            cat.setAnimToPlay(`idle-${cat.texture.key}`);
                         });
                     });
-
-                console.log('build iteration sucessful');
-            }
         });
 
-        this.children.entries[8].animToPlay = `build-${this.children.entries[8].texture.key}`
-        this.scene.time.delayedCall(1500, () => {
-            this.children.entries[8].setAnimToPlay(`idle-${this.children.entries[8].texture.key}`);
-        });
 
         //DEBUG
         console.log('called build method');
-        this.action = undefined;
     }
 
     gatherAction() {
         //DEBUG
         console.log('called gather method');
-        this.action = undefined;
     }
 }
 
@@ -141,8 +139,6 @@ class Wall extends Phaser.Physics.Arcade.Image {
     height = 0;
     /**@type {Family} */
     family;
-    /**@type {Phaser.GameObjects.Image} */
-    arrow;
 
     /**
      * @param {Phaser.Scene} scene 
