@@ -40,28 +40,30 @@ export class Family extends Phaser.GameObjects.Group {
     }
 
     buildAction() {
-        const cat = this.children.entries[8];
+        const pet = this.children.entries[8];
 
         this.children.iterate((e, ix) => {
             if (!(ix % 2 === 0))
                 e.setInteractive()
-                    .on('pointerover', function () {
-                        this.setTint(0x5ee9e9);
-                    })
-                    .on('pointerout', function () {
-                        this.clearTint();
-                    })
+                    .on('pointerover', function () { this.setTint(0x5ee9e9); })
+                    .on('pointerout', function () { this.clearTint(); })
                     .on('pointerdown', function () {
                         this.scene.sound.play('confirm');
+
+                        this.wallHeight++;
+                        console.log(this.wallHeight);
 
                         this.family.children.iterate((e, ix) => {
                             if (!(ix % 2 === 0))
                                 e.disableInteractive();
                         });
-                        cat.setAnimToPlay(`build-${cat.texture.key}`);
+
+                        pet.setAnimToPlay(`build-${pet.texture.key}`);
                         this.scene.time.delayedCall(1500, () => {
-                            cat.setAnimToPlay(`idle-${cat.texture.key}`);
+                            pet.setAnimToPlay(`idle-${pet.texture.key}`);
                         });
+
+                        console.log("PILE WAS CLICKED")
                     });
         });
 
@@ -135,8 +137,12 @@ class Pet extends Phaser.GameObjects.Sprite {
 }
 
 class Wall extends Phaser.Physics.Arcade.Image {
+    /*
+        IMPORTANT: it's called wall height now because we 
+        were accidentally overriding super's variable
+    */
     /**@type {number} */
-    height = 0;
+    wallHeight = 0;
     /**@type {Family} */
     family;
 
@@ -153,7 +159,7 @@ class Wall extends Phaser.Physics.Arcade.Image {
     }
 
     preUpdate() {
-        this.setFrame(this.height);
+        this.setFrame(this.wallHeight);
     }
 }
 
