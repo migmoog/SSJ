@@ -1,3 +1,5 @@
+import { Family } from "./Family.js";
+
 export default class TBGbtns extends Phaser.GameObjects.Group {
     /**@type {string} */
     action;
@@ -62,29 +64,34 @@ class Btn extends Phaser.GameObjects.Image {
     constructor(scn, grp, fam, x, y, texture, frame) {
         super(scn, x, y, texture, frame);
 
-        if (frame === 0)
-            this.action = 'throw';
-        else if (frame === 2)
-            this.action = 'build';
-        else if (frame === 4)
-            this.action = 'gather';
+        switch (frame) {
+            case 0:
+                this.action = 'throw';
+                break;
+            case 2:
+                this.action = 'build';
+                break;
+            case 4:
+                this.action = 'gather';
+        }
 
         this.group = grp;
         this.family = fam;
-        this.sound = scn.sound.add('hoverbtn');
+        this.sound = scn.sound.add('hoverbtn', { volume: 0.5 });
 
         this.setInteractive()
             .on('pointerover', () => {
                 this.setFrame(this.returnHighlight(frame));
                 this.sound.play();
             })
-            .on('pointerout', () => {
-                this.setFrame(frame);
-            })
+            .on('pointerout', () => { this.setFrame(frame); })
             .on('pointerdown', () => {
                 scn.sound.play('confirm');
+
                 this.group.children.iterate((e, ix) => {
+                    e.disableInteractive();
                     e.sound.destroy();
+                    // tweens ALL buttons out of the scene
                     scn.add.tween({
                         duration: 500,
                         ease: Phaser.Math.Easing.Quadratic.InOut,
@@ -99,9 +106,19 @@ class Btn extends Phaser.GameObjects.Image {
                 this.group.action = this.action;
                 this.family.action = this.action;
 
-                //DEBUG
-                console.log("Group action: " + this.group.action);
-                console.log("Family action: " + this.family.action);
+                if (!this.family.isTurn) {
+                    switch (this.action) {
+                        case 'throw':
+                            this.family.throwAction();
+                            break;
+                        case 'build':
+                            this.family.buildAction();
+                            break;
+                        case 'gather':
+                            this.family.gatherAction();
+                            break;
+                    }
+                }
             });
 
         scn.add.existing(this);

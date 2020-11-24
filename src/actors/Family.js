@@ -1,4 +1,4 @@
-export default class Family extends Phaser.GameObjects.Group {
+export class Family extends Phaser.GameObjects.Group {
     /**@type {boolean} */
     isTurn;
     /**@type {TBGbtns} */
@@ -32,6 +32,29 @@ export default class Family extends Phaser.GameObjects.Group {
 
     preUpdate(t, dt) {
         super.preUpdate(t, dt);
+    }
+
+    throwAction() {
+        //DEBUG
+        console.log('called throw method');
+        this.action = undefined;
+    }
+
+    buildAction() {
+        this.children.entries[8].animToPlay = `build-${this.children.entries[8].texture.key}`
+        this.scene.time.delayedCall(1500, () => {
+            this.children.entries[8].setAnimToPlay( `idle-${this.children.entries[8].texture.key}`);
+        });
+        
+        //DEBUG
+        console.log('called build method');
+        this.action = undefined;
+    }
+
+    gatherAction() {
+        //DEBUG
+        console.log('called gather method');
+        this.action = undefined;
     }
 }
 
@@ -70,6 +93,8 @@ class FamilyMember extends Phaser.GameObjects.Sprite {
 }
 
 class Pet extends Phaser.GameObjects.Sprite {
+    animToPlay = `idle-${this.texture.key}`;
+    
     /**
      * @param {Phaser.Scene} scene 
      * @param {number} x 
@@ -81,13 +106,17 @@ class Pet extends Phaser.GameObjects.Sprite {
     }
 
     preUpdate(t, dt) {
-        this.play('idle-' + this.texture.key, true);
+        this.play(this.animToPlay, true);
 
         super.preUpdate(t, dt);
     }
+
+    setAnimToPlay(anim) {
+        this.animToPlay = anim;
+    }
 }
 
-class Wall extends Phaser.GameObjects.Image {
+class Wall extends Phaser.Physics.Arcade.Image {
     /**@type {number} */
     height = 0;
 

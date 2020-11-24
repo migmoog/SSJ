@@ -1,4 +1,4 @@
-import Scene from "./scenes/Scene.js";
+import TwoPlayer from "./scenes/TwoPlayer.js";
 
 class P extends Phaser.Scene {
     preload() {
@@ -54,16 +54,26 @@ class P extends Phaser.Scene {
         // TODO finish pet anims
         this.anims.create({
             key: 'idle-cat',
-            frames: this.anims.generateFrameNumbers('cat', { start: 0, end: 1 }),
+            frames: this.anims.generateFrameNumbers('cat', { start: 0, end: 2 }),
+            frameRate: 4
+        });
+        this.anims.create({
+            key: 'build-cat',
+            frames: this.anims.generateFrameNumbers('cat', { start: 3, end: 5 }),
             frameRate: 4
         });
         this.anims.create({
             key: 'idle-dog',
-            frames: this.anims.generateFrameNumbers('dog', { start: 0, end: 1 }),
+            frames: this.anims.generateFrameNumbers('dog', { start: 0, end: 2 }),
+            frameRate: 4
+        });
+        this.anims.create({
+            key: 'build-dog',
+            frames: this.anims.generateFrameNumbers('dog', { start: 3, end: 5}),
             frameRate: 4
         });
 
-        this.scene.switch('scene');
+        this.scene.switch('two player');
     }
 
     constructor() { super('preload'); }
@@ -71,7 +81,7 @@ class P extends Phaser.Scene {
 
 export default new Phaser.Game({
     type: Phaser.AUTO,
-    scene: [P, Scene],
+    scene: [P, TwoPlayer],
     scale: {
         width: 320,
         height: 180,

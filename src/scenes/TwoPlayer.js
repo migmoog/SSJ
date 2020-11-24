@@ -1,8 +1,8 @@
-import Family from "../actors/Family.js";
+import { Family } from "../actors/Family.js";
 import TBGbtns from "../actors/TBGbtns.js";
 
 //TODO implement the action strings in game
-export default class Scene extends Phaser.Scene {
+export default class TwoPlayer extends Phaser.Scene {
     /**@type {Phaser.Sound.BaseSound} */
     music;
 
@@ -19,7 +19,7 @@ export default class Scene extends Phaser.Scene {
     p2Btns;
 
     create() {
-        this.music = this.sound.add('battle theme', { loop: true, volume: 0.5 }).play();
+        this.sound.add('battle theme', { loop: true, volume: 0.5 }).play();
 
         this.add.image(0, 0, 'bg').setOrigin(0, 0);
 
@@ -40,5 +40,5 @@ export default class Scene extends Phaser.Scene {
         }
     }
 
-    constructor() { super('scene'); }
+    constructor() { super('two player'); }
 }
