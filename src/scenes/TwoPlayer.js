@@ -1,7 +1,6 @@
 import { Family } from "../actors/Family.js";
 import TBGbtns from "../actors/TBGbtns.js";
 
-//TODO implement the action strings in game
 export default class TwoPlayer extends Phaser.Scene {
     /**@type {Phaser.Sound.BaseSound} */
     music;

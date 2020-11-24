@@ -101,12 +101,18 @@ class FamilyMember extends Phaser.GameObjects.Sprite {
     /**@type {number} */
     health = 6;
 
+    /**
+     * @param {Phaser.Scene} scene 
+     * @param {number} x 
+     * @param {number} y 
+     * @param {number} texture 
+     */
     constructor(scene, x, y, texture) {
         super(scene, x, y, texture);
     }
 
     preUpdate(t, dt) {
-        this.play('bounce-' + this.texture.key, true);
+        this.play(`bounce-${this.texture.key}`, true);
 
         super.preUpdate(t, dt);
     }

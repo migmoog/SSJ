@@ -3,6 +3,7 @@ import TwoPlayer from "./scenes/TwoPlayer.js";
 class P extends Phaser.Scene {
     preload() {
         this.load.image('bg', 'assets/images/bg.png');
+        this.load.image('c', 'assets/images/c.png');
 
         // Family preloads
         for (let i = 0; i < 4; i++) {
@@ -52,7 +53,7 @@ class P extends Phaser.Scene {
             });
         }
 
-        // TODO finish pet anims
+        // Pet animations
         this.anims.create({
             key: 'idle-cat',
             frames: this.anims.generateFrameNumbers('cat', { start: 0, end: 2 }),
