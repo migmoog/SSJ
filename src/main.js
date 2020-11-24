@@ -20,6 +20,7 @@ class P extends Phaser.Scene {
         
         // Snow preloads
         this.load.spritesheet('wall', 'assets/images/wall.png', { frameWidth: 16, frameHeight: 32 });
+        this.load.image('arrow', 'assets/images/arrow.png');
 
         // UI preloads
         this.load.spritesheet('p1-btn', 'assets/images/p1-btn.png', { frameWidth: 48, frameHeight: 16 });

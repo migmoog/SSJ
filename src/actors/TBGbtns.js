@@ -90,7 +90,6 @@ class Btn extends Phaser.GameObjects.Image {
 
                 this.group.children.iterate((e, ix) => {
                     e.disableInteractive();
-                    e.sound.destroy();
                     // tweens ALL buttons out of the scene
                     scn.add.tween({
                         duration: 500,

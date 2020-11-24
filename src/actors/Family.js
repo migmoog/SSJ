@@ -24,7 +24,7 @@ export class Family extends Phaser.GameObjects.Group {
         for (let i = 0; i < 4; i++)
             this.addMultiple([
                 new FamilyMember(scene, x, y + (i * 35), texture + i.toString()),
-                new Wall(scene, x <= 70 ? x + 30 : x - 30, y + (i * 35))
+                new Wall(scene, x <= 70 ? x + 30 : x - 30, y + (i * 35), this)
             ], true);
 
         this.add(new Pet(scene, petX, 95, petTexture), true);
@@ -41,11 +41,31 @@ export class Family extends Phaser.GameObjects.Group {
     }
 
     buildAction() {
+        let catBuild = false;
+
+        this.children.iterate((e, ix) => {
+            if (!(ix % 2 === 0)) {
+                e.setInteractive()
+                    .on('pointerover', () => { e.arrow = this.scene.add.image(e.x, e.y, 'arrow'); })
+                    .on('pointerout', () => { e.arrow.setVisible(false); })
+                    .on('pointerdown', () => {
+                        this.scene.sound.play('confirm');
+                        e.arrow.destroy();
+
+                        this.children.iterate((e, ix) => {
+                            e.disableInteractive();
+                        });
+                    });
+
+                console.log('build iteration sucessful');
+            }
+        });
+
         this.children.entries[8].animToPlay = `build-${this.children.entries[8].texture.key}`
         this.scene.time.delayedCall(1500, () => {
-            this.children.entries[8].setAnimToPlay( `idle-${this.children.entries[8].texture.key}`);
+            this.children.entries[8].setAnimToPlay(`idle-${this.children.entries[8].texture.key}`);
         });
-        
+
         //DEBUG
         console.log('called build method');
         this.action = undefined;
@@ -94,7 +114,7 @@ class FamilyMember extends Phaser.GameObjects.Sprite {
 
 class Pet extends Phaser.GameObjects.Sprite {
     animToPlay = `idle-${this.texture.key}`;
-    
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {number} x 
@@ -119,17 +139,25 @@ class Pet extends Phaser.GameObjects.Sprite {
 class Wall extends Phaser.Physics.Arcade.Image {
     /**@type {number} */
     height = 0;
+    /**@type {Family} */
+    family;
+    /**@type {Phaser.GameObjects.Image} */
+    arrow;
 
     /**
      * @param {Phaser.Scene} scene 
      * @param {number} x 
      * @param {number} y 
+     * @param {Family} fam
      */
-    constructor(scene, x, y) {
+    constructor(scene, x, y, fam) {
         super(scene, x, y, 'wall', 0);
+
+        this.family = fam;
     }
 
     preUpdate() {
+        this.setFrame(this.height);
     }
 }
 
