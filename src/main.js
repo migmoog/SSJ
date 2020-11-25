@@ -29,6 +29,8 @@ class P extends Phaser.Scene {
 
         // Audio and Music preloads
         this.load.audio('battle theme', ['assets/music/battletheme.mp3']);
+        this.load.audio('battle lost', ['assets/music/battlelost.mp3']);
+
         this.load.audio('confirm', ['assets/sounds/confirm.mp3']);
         this.load.audio('cancel', ['assets/sounds/cancel.mp3']);
         this.load.audio('hoverbtn', ['assets/sounds/hoverbtn.mp3']);
@@ -43,12 +45,12 @@ class P extends Phaser.Scene {
 
             this.anims.create({
                 key: 'bounce-p1-' + s,
-                frames: this.anims.generateFrameNumbers('p1-' + s, bounceConfig),
+                frames: this.anims.generateFrameNumbers(`p1-${s}`, bounceConfig),
                 frameRate: 4
             });
             this.anims.create({
                 key: 'bounce-p2-' + s,
-                frames: this.anims.generateFrameNumbers('p2-' + s, bounceConfig),
+                frames: this.anims.generateFrameNumbers(`p2-${s}`, bounceConfig),
                 frameRate: 4
             });
         }

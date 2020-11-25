@@ -67,7 +67,6 @@ export class Family extends Phaser.GameObjects.Group {
                     });
         });
 
-
         //DEBUG
         console.log('called build method');
     }
