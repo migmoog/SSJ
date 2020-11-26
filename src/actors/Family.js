@@ -45,26 +45,6 @@ export class Family extends Phaser.GameObjects.Group {
         this.children.iterate((e, ix) => {
             if (!(ix % 2 === 0))
                 e.setInteractive()
-                    .on('pointerover', function () { this.setTint(0x5ee9e9); })
-                    .on('pointerout', function () { this.clearTint(); })
-                    .on('pointerdown', function () {
-                        this.scene.sound.play('confirm');
-
-                        this.wallHeight++;
-                        console.log(this.wallHeight);
-
-                        this.family.children.iterate((e, ix) => {
-                            if (!(ix % 2 === 0))
-                                e.disableInteractive();
-                        });
-
-                        pet.setAnimToPlay(`build-${pet.texture.key}`);
-                        this.scene.time.delayedCall(1500, () => {
-                            pet.setAnimToPlay(`idle-${pet.texture.key}`);
-                        });
-
-                        console.log("PILE WAS CLICKED")
-                    });
         });
 
         //DEBUG
@@ -161,10 +141,38 @@ class Wall extends Phaser.Physics.Arcade.Image {
         super(scene, x, y, 'wall', 0);
 
         this.family = fam;
+
+        this.on('pointerover', function () { this.setTint(0x5ee9e9); })
+            .on('pointerout', function () { this.clearTint(); })
+            .on('pointerdown', function () {
+                const pet = fam.children.entries[8];
+                this.scene.sound.play('confirm');
+
+                this.wallHeight++;
+                console.log(this.wallHeight);
+
+                this.family.children.iterate((e, ix) => {
+                    if (!(ix % 2 === 0))
+                        e.disableInteractive();
+                });
+
+                pet.setAnimToPlay(`build-${pet.texture.key}`);
+                this.scene.time.delayedCall(1500, () => {
+                    pet.setAnimToPlay(`idle-${pet.texture.key}`);
+                    this.family.isTurn = true;
+                });
+
+                console.log("PILE WAS CLICKED")
+            });
     }
 
     preUpdate() {
         this.setFrame(this.wallHeight);
+        
+        if (this.wallHeight > 4) 
+            this.wallHeight = 4;
+        else if (this.wallHeight < 0)
+            this.wallHeight = 0;
     }
 }
 
