@@ -43,7 +43,7 @@ export class Family extends Phaser.GameObjects.Group {
         const pet = this.children.entries[8];
 
         this.children.iterate((e, ix) => {
-            if (!(ix % 2 === 0))
+            if (ix % 2 !== 0)
                 e.setInteractive()
         });
 
