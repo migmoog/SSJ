@@ -27,7 +27,10 @@ export class Family extends Phaser.GameObjects.Group {
                 new Wall(scene, x <= 70 ? x + 30 : x - 30, y + (i * 35), this)
             ], true);
 
-        this.add(new Pet(scene, petX, 95, petTexture), true);
+        this.addMultiple([
+            new Pet(scene, petX, 95, petTexture),
+            new SnowPile(scene, x <= 70 ? x - 30 : x + 30, 95).setFlipX(x > 70)
+        ], true);
     }
 
     preUpdate(t, dt) {
@@ -151,7 +154,7 @@ class Wall extends Phaser.Physics.Arcade.Image {
                 this.wallHeight++;
                 console.log(this.wallHeight);
 
-                this.family.children.iterate((e, ix) => {
+                fam.children.iterate((e, ix) => {
                     if (!(ix % 2 === 0))
                         e.disableInteractive();
                 });
@@ -159,7 +162,7 @@ class Wall extends Phaser.Physics.Arcade.Image {
                 pet.setAnimToPlay(`build-${pet.texture.key}`);
                 this.scene.time.delayedCall(1500, () => {
                     pet.setAnimToPlay(`idle-${pet.texture.key}`);
-                    this.family.isTurn = true;
+                    fam.isTurn = true;
                 });
 
                 console.log("PILE WAS CLICKED")
@@ -168,8 +171,8 @@ class Wall extends Phaser.Physics.Arcade.Image {
 
     preUpdate() {
         this.setFrame(this.wallHeight);
-        
-        if (this.wallHeight > 4) 
+
+        if (this.wallHeight > 4)
             this.wallHeight = 4;
         else if (this.wallHeight < 0)
             this.wallHeight = 0;
@@ -177,6 +180,8 @@ class Wall extends Phaser.Physics.Arcade.Image {
 }
 
 class SnowPile extends Phaser.GameObjects.Image {
+    amount = 20;
+
     /**
      * @param {Phaser.Scene} scn 
      * @param {number} x 
@@ -184,5 +189,9 @@ class SnowPile extends Phaser.GameObjects.Image {
      */
     constructor(scn, x, y) {
         super(scn, x, y, 'snowpile');
+    }
+
+    preUpdate() {
+        this.setFrame(this.amount / 4);
     }
 }

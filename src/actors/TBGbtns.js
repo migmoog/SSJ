@@ -21,18 +21,30 @@ export default class TBGbtns extends Phaser.GameObjects.Group {
     }
 
     makeButtons() {
-        this.addMultiple([
-            new Btn(this.scene, this, this.family, this.scene.scale.width / 2, 196, this.buttonKey, 0),
-            new Btn(this.scene, this, this.family, this.scene.scale.width / 2, 196, this.buttonKey, 2),
-            new Btn(this.scene, this, this.family, this.scene.scale.width / 2, 196, this.buttonKey, 4)
-        ], true);
+        if (this.family.children.entries[9].amount !== 0) {
+            this.addMultiple([
+                new Btn(this.scene, this, this.family, this.scene.scale.width / 2, 196, this.buttonKey, 0),
+                new Btn(this.scene, this, this.family, this.scene.scale.width / 2, 196, this.buttonKey, 2),
+                new Btn(this.scene, this, this.family, this.scene.scale.width / 2, 196, this.buttonKey, 4)
+            ], true);
+            for (let i = 0; i < 3; i++)
+                this.scene.tweens.add({
+                    ease: Phaser.Math.Easing.Quadratic.InOut,
+                    targets: this.children.entries[i],
+                    y: 40 + (i * 50)
+                });
+        }
+        else {
+            this.add(
+                new Btn(this.scene, this, this.family, this.scene.scale.width / 2, 196, this.buttonKey, 4)
+            , true);
 
-        for (let i = 0; i < 3; i++)
-            this.scene.add.tween({
+            this.scene.tweens.add({
                 ease: Phaser.Math.Easing.Quadratic.InOut,
-                targets: this.children.entries[i],
-                y: 40 + (i * 50)
+                targets: this.children.entries,
+                y: this.scene.scale.height / 2
             });
+        }
     }
 
     preUpdate(t, dt) {
@@ -108,10 +120,12 @@ class Btn extends Phaser.GameObjects.Image {
                 if (!this.family.isTurn) {
                     switch (this.action) {
                         case 'throw':
-                            this.family.throwAction();
+                            if (this.family.children.entries[9].amount !== 0)
+                                this.family.throwAction();
                             break;
                         case 'build':
-                            this.family.buildAction();
+                            if (this.family.children.entries[9].amount !== 0)
+                                this.family.buildAction();
                             break;
                         case 'gather':
                             this.family.gatherAction();

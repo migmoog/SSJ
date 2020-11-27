@@ -10,17 +10,18 @@ class P extends Phaser.Scene {
             const familyConfig = { frameWidth: 32, frameHeight: 32 };
             const s = i.toString();
 
-            this.load.spritesheet('p1-' + s, 'assets/images/p1-' + s + '.png', familyConfig);
-            this.load.spritesheet('p2-' + s, 'assets/images/p2-' + s + '.png', familyConfig);
+            this.load.spritesheet(`p1-${s}`, `assets/images/p1-${s}.png`, familyConfig);
+            this.load.spritesheet(`p2-${s}`, `assets/images/p2-${s}.png`, familyConfig);
         }
 
         // Pet graphics preloads
         const petConfig = { frameWidth: 16, frameHeight: 16 };
         this.load.spritesheet('cat', 'assets/images/cat.png', petConfig);
         this.load.spritesheet('dog', 'assets/images/dog.png', petConfig);
-        
+
         // Snow preloads
         this.load.spritesheet('wall', 'assets/images/wall.png', { frameWidth: 16, frameHeight: 32 });
+        this.load.spritesheet('snowpile', 'assets/images/snowpile.png', { frameWidth: 32, frameHeight: 96 });
         this.load.image('arrow', 'assets/images/arrow.png');
 
         // UI preloads
@@ -73,7 +74,7 @@ class P extends Phaser.Scene {
         });
         this.anims.create({
             key: 'build-dog',
-            frames: this.anims.generateFrameNumbers('dog', { start: 3, end: 5}),
+            frames: this.anims.generateFrameNumbers('dog', { start: 3, end: 5 }),
             frameRate: 4
         });
 
