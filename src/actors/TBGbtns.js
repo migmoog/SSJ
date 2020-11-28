@@ -37,7 +37,7 @@ export default class TBGbtns extends Phaser.GameObjects.Group {
         else {
             this.add(
                 new Btn(this.scene, this, this.family, this.scene.scale.width / 2, 196, this.buttonKey, 4)
-            , true);
+                , true);
 
             this.scene.tweens.add({
                 ease: Phaser.Math.Easing.Quadratic.InOut,
@@ -59,8 +59,6 @@ class Btn extends Phaser.GameObjects.Image {
     family;
     /**@type {string} */
     action;
-    /**@type {boolean} */
-    returnAction = false;
     /**@type {Phaser.Sound.BaseSound} */
     sound;
 
@@ -87,7 +85,7 @@ class Btn extends Phaser.GameObjects.Image {
                 this.action = 'gather';
         }
 
-        this.group = grp;
+        // this.group = grp;
         this.family = fam;
         this.sound = scn.sound.add('hoverbtn', { volume: 0.5 });
 
@@ -100,7 +98,7 @@ class Btn extends Phaser.GameObjects.Image {
             .on('pointerdown', () => {
                 scn.sound.play('confirm');
 
-                this.group.children.iterate((e, ix) => {
+                grp.children.iterate((e, ix) => {
                     e.disableInteractive();
                     // tweens ALL buttons out of the scene
                     scn.add.tween({
@@ -114,21 +112,20 @@ class Btn extends Phaser.GameObjects.Image {
                     });
                 });
 
-                this.group.action = this.action;
-                this.family.action = this.action;
+                fam.action = this.action;
 
-                if (!this.family.isTurn) {
+                if (!fam.isTurn) {
                     switch (this.action) {
                         case 'throw':
-                            if (this.family.children.entries[9].amount !== 0)
-                                this.family.throwAction();
+                            if (fam.children.entries[9].amount !== 0)
+                                fam.throwAction();
                             break;
                         case 'build':
-                            if (this.family.children.entries[9].amount !== 0)
-                                this.family.buildAction();
+                            if (fam.children.entries[9].amount !== 0)
+                                fam.buildAction();
                             break;
                         case 'gather':
-                            this.family.gatherAction();
+                            fam.gatherAction();
                             break;
                     }
                 }
@@ -149,6 +146,5 @@ class Btn extends Phaser.GameObjects.Image {
         }
     }
 
-    preUpdate() {
-    }
+    preUpdate() { }
 }

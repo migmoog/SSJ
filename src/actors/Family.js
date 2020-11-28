@@ -5,8 +5,6 @@ export class Family extends Phaser.GameObjects.Group {
     btns;
     /**@type {string} */
     action;
-    /**@type {string} */
-    petAnim;
 
     /**
      * @param {Phaser.Scene} scene 
@@ -21,7 +19,6 @@ export class Family extends Phaser.GameObjects.Group {
     constructor(scene, x, y, texture, petTexture, petX, isTurn) {
         super(scene);
 
-        this.petAnim = `idle-${petTexture}`
         this.isTurn = isTurn;
 
         for (let i = 0; i < 4; i++)
@@ -31,14 +28,12 @@ export class Family extends Phaser.GameObjects.Group {
             ], true);
 
         this.addMultiple([
-            // new Pet(scene, petX, 95, petTexture)
-            scene.add.sprite(petX, 95, petTexture),
+            new Pet(scene, petX, 95, petTexture),
             new SnowPile(scene, x <= 70 ? x - 30 : x + 30, 95).setFlipX(x > 70)
         ], true);
     }
 
     preUpdate(t, dt) {
-        this.children.entries[8].play(this.petAnim);
         super.preUpdate(t, dt);
     }
 
@@ -105,6 +100,30 @@ class FamilyMember extends Phaser.GameObjects.Sprite {
     }
 }
 
+class Pet extends Phaser.GameObjects.Sprite {
+    animToPlay = `idle-${this.texture.key}`;
+
+    /**
+     * @param {Phaser.Scene} scene 
+     * @param {number} x 
+     * @param {number} y 
+     * @param {string} texture 
+     */
+    constructor(scene, x, y, texture) {
+        super(scene, x, y, texture);
+    }
+
+    preUpdate(t, dt) {
+        this.play(this.animToPlay, true);
+
+        super.preUpdate(t, dt);
+    }
+
+    setAnimToPlay(anim) {
+        this.animToPlay = anim;
+    }
+}
+
 //TODO add choices of value increase for walls
 class Wall extends Phaser.Physics.Arcade.Image {
     /*
@@ -128,6 +147,7 @@ class Wall extends Phaser.Physics.Arcade.Image {
         this.on('pointerover', function () { this.setTint(0x5ee9e9); })
             .on('pointerout', function () { this.clearTint(); })
             .on('pointerdown', function () {
+                const pet = fam.children.entries[8];
                 this.scene.sound.play('confirm');
 
                 this.wallHeight++;
@@ -138,9 +158,9 @@ class Wall extends Phaser.Physics.Arcade.Image {
                         e.disableInteractive();
                 });
 
-                fam.petAnim = `build-${pet.texture.key}`;
+                pet.setAnimToPlay(`build-${pet.texture.key}`);
                 this.scene.time.delayedCall(1500, () => {
-                    fam.petAnim = `idle-${pet.texture.key}`;
+                    pet.setAnimToPlay(`idle-${pet.texture.key}`);
                     fam.isTurn = true;
                 });
 
@@ -171,6 +191,6 @@ class SnowPile extends Phaser.GameObjects.Image {
     }
 
     preUpdate() {
-        this.setFrame(this.amount / 4);
+        // this.setFrame(this.amount / 4);
     }
 }
