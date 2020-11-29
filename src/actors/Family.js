@@ -1,8 +1,7 @@
+// TODO finish Gather and Throw
 export class Family extends Phaser.GameObjects.Group {
     /**@type {boolean} */
     isTurn;
-    /**@type {TBGbtns} */
-    btns;
     /**@type {string} */
     action;
 
@@ -14,7 +13,6 @@ export class Family extends Phaser.GameObjects.Group {
      * @param {string} petTexture
      * @param {number} petX
      * @param {boolean} isTurn 
-     * @param {TBGbtns} btns
      */
     constructor(scene, x, y, texture, petTexture, petX, isTurn) {
         super(scene);
@@ -41,41 +39,99 @@ export class Family extends Phaser.GameObjects.Group {
         //DEBUG
         console.log('called throw method');
     }
-
+    
     buildAction() {
-        const pet = this.children.entries[8];
-
         this.children.iterate((e, ix) => {
             if (ix % 2 !== 0)
-                e.setInteractive()
+            e.setInteractive()
         });
 
         //DEBUG
         console.log('called build method');
     }
-
+    
     gatherAction() {
+        const pet = this.children.entries[8];
+        this.scene.tweens.add({
+            targets: pet,
+            duration: 1000,
+            yoyo: true,
+            x: pet.x >= 70 ? -16 : this.scene.scale.width + 16,
+            onStart: (twn, tgt) => {
+                tgt[0].setFlipX(true).setAnimToPlay(`build-${pet.texture.key}`);
+            },
+            onYoyo: (twn, tgt) => { 
+                tgt.setFlipX(false); 
+            },
+            onComplete: (twn, tgt) => {
+                this.scene.time.delayedCall(1000, () => {
+                    tgt[0].setAnimToPlay(`idle-${pet.texture.key}`);
+                    
+                    this.children.entries[9].amount++;
+                    console.log(this.children.entries[9].amount);
+                    
+                    this.isTurn = true;
+                });
+            }
+        });
+        
         //DEBUG
         console.log('called gather method');
     }
 }
 
-export class AIfamily extends Family {
-    /**@type {boolean} */
-    isTurn;
-    /**@type {TBGbtns} */
-    btns;
-    /**@type {string} */
-    action;
+//TODO add choices of value increase for walls
+class Wall extends Phaser.Physics.Arcade.Image {
+    /**@type {number} */
+    wallHeight = 0;
+    /**@type {Family} */
+    family;
 
-    constructor(scene, x, y, texture, petTexture, petX, isTurn) {
-        super(scene, x, y, texture, petTexture, petX, isTurn);
+    /**
+     * @param {Phaser.Scene} scene 
+     * @param {number} x 
+     * @param {number} y 
+     * @param {Family} fam
+     */
+    constructor(scene, x, y, fam) {
+        super(scene, x, y, 'wall', 0);
 
-        this.isTurn = isTurn
+        this.family = fam;
+
+        this.on('pointerover', () => { this.setTint(0x5ee9e9); })
+            .on('pointerout', () => { this.clearTint(); })
+            .on('pointerdown', () => {
+                const pet = fam.children.entries[8];
+                const pile = fam.children.entries[9];
+                this.scene.sound.play('confirm');
+
+                this.wallHeight++;
+                console.log(this.wallHeight);
+                pile.amount--;
+                console.log(pile.amount);
+
+                fam.children.iterate((e, ix) => {
+                    if (!(ix % 2 === 0))
+                        e.disableInteractive();
+                });
+
+                pet.setAnimToPlay(`build-${pet.texture.key}`);
+                this.scene.time.delayedCall(1500, () => {
+                    pet.setAnimToPlay(`idle-${pet.texture.key}`);
+                    fam.isTurn = true;
+                });
+
+                console.log("PILE WAS CLICKED")
+            });
     }
 
-    preUpdate(t, dt) {
+    preUpdate() {
+        this.setFrame(this.wallHeight);
 
+        if (this.wallHeight > 4)
+            this.wallHeight = 4;
+        else if (this.wallHeight < 0)
+            this.wallHeight = 0;
     }
 }
 
@@ -124,62 +180,8 @@ class Pet extends Phaser.GameObjects.Sprite {
     }
 }
 
-//TODO add choices of value increase for walls
-class Wall extends Phaser.Physics.Arcade.Image {
-    /*
-        IMPORTANT: it's called wall height now because we 
-        were accidentally overriding super's variable
-    */
-    /**@type {number} */
-    wallHeight = 0;
-    /**@type {Family} */
-    family;
-
-    /**
-     * @param {Phaser.Scene} scene 
-     * @param {number} x 
-     * @param {number} y 
-     * @param {Family} fam
-     */
-    constructor(scene, x, y, fam) {
-        super(scene, x, y, 'wall', 0);
-
-        this.on('pointerover', function () { this.setTint(0x5ee9e9); })
-            .on('pointerout', function () { this.clearTint(); })
-            .on('pointerdown', function () {
-                const pet = fam.children.entries[8];
-                this.scene.sound.play('confirm');
-
-                this.wallHeight++;
-                console.log(this.wallHeight);
-
-                fam.children.iterate((e, ix) => {
-                    if (!(ix % 2 === 0))
-                        e.disableInteractive();
-                });
-
-                pet.setAnimToPlay(`build-${pet.texture.key}`);
-                this.scene.time.delayedCall(1500, () => {
-                    pet.setAnimToPlay(`idle-${pet.texture.key}`);
-                    fam.isTurn = true;
-                });
-
-                console.log("PILE WAS CLICKED")
-            });
-    }
-
-    preUpdate() {
-        this.setFrame(this.wallHeight);
-
-        if (this.wallHeight > 4)
-            this.wallHeight = 4;
-        else if (this.wallHeight < 0)
-            this.wallHeight = 0;
-    }
-}
-
 class SnowPile extends Phaser.GameObjects.Image {
-    amount = 20;
+    amount = 15;
 
     /**
      * @param {Phaser.Scene} scn 
@@ -191,6 +193,18 @@ class SnowPile extends Phaser.GameObjects.Image {
     }
 
     preUpdate() {
-        // this.setFrame(this.amount / 4);
+        this.setFrame(this.returnFrame(this.amount));
+    }
+
+    returnFrame(amnt) {
+        if (amnt <= 15) {
+            return 3;
+        } else if (amnt <= 10) {
+            return 2;
+        } else if (amnt <= 5) {
+            return 1;
+        } else if (amnt === 0) {
+            return 0;
+        }
     }
 }
