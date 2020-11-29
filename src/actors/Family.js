@@ -1,9 +1,13 @@
+import TBGbtns from "./TBGbtns.js";
+
 // TODO finish Gather and Throw
 export class Family extends Phaser.GameObjects.Group {
     /**@type {boolean} */
     isTurn;
     /**@type {string} */
     action;
+    /**@type {TBGbtns} */
+    btns
 
     /**
      * @param {Phaser.Scene} scene 
@@ -18,6 +22,7 @@ export class Family extends Phaser.GameObjects.Group {
         super(scene);
 
         this.isTurn = isTurn;
+        this.btns = new TBGbtns(scene, this, `${texture}btn`);
 
         for (let i = 0; i < 4; i++)
             this.addMultiple([
@@ -42,7 +47,7 @@ export class Family extends Phaser.GameObjects.Group {
 
     buildAction() {
         this.children.iterate((e, ix) => {
-            if (ix % 2 !== 0)
+            if (ix % 2 !== 0 && e.wallHeight < 4)
                 e.setInteractive()
         });
 
@@ -109,7 +114,7 @@ class Wall extends Phaser.Physics.Arcade.Image {
                 console.log(pile.amount);
 
                 fam.children.iterate((e, ix) => {
-                    if (!(ix % 2 === 0))
+                    if (ix % 2 !== 0)
                         e.disableInteractive();
                 });
 
