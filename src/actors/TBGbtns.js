@@ -45,6 +45,8 @@ export default class TBGbtns extends Phaser.GameObjects.Group {
                 y: this.scene.scale.height / 2
             });
         }
+
+        this.family.isTurn = false;
     }
 
     preUpdate(t, dt) {
@@ -114,20 +116,18 @@ class Btn extends Phaser.GameObjects.Image {
 
                 fam.action = this.action;
 
-                if (!fam.isTurn) {
-                    switch (this.action) {
-                        case 'throw':
-                            if (fam.children.entries[9].amount !== 0)
-                                fam.throwAction();
-                            break;
-                        case 'build':
-                            if (fam.children.entries[9].amount !== 0)
-                                fam.buildAction();
-                            break;
-                        case 'gather':
-                            fam.gatherAction();
-                            break;
-                    }
+                switch (this.action) {
+                    case 'throw':
+                        if (fam.children.entries[9].amount !== 0)
+                            fam.throwAction();
+                        break;
+                    case 'build':
+                        if (fam.children.entries[9].amount !== 0)
+                            fam.buildAction();
+                        break;
+                    case 'gather':
+                        fam.gatherAction();
+                        break;
                 }
             });
 

@@ -1,5 +1,4 @@
 import { Family } from "../actors/Family.js";
-import TBGbtns from "../actors/TBGbtns.js";
 
 export default class TwoPlayer extends Phaser.Scene {
     /**@type {Phaser.Sound.BaseSound} */
@@ -20,17 +19,27 @@ export default class TwoPlayer extends Phaser.Scene {
         this.player1 = new Family(this, 70, 40, 'p1-', 'cat', 120, true);
         this.player2 = new Family(this, 250, 40, 'p2-', 'dog', 200, false);
 
-        this.physics.add.overlap(this.player1, )
+        this.player1.opponent = this.player2;
+        this.player2.opponent = this.player1;
+
+        this.physics.add.overlap(this.player1, this.player2, () => {
+
+        });
     }
 
     update(d, dt) {
         if (this.player1.isTurn) {
             this.player1.btns.makeButtons();
-            this.player1.isTurn = false;
         } else if (this.player2.isTurn) {
             this.player2.btns.makeButtons();
-            this.player2.isTurn = false;
         }
+    }
+
+    changeTurn() {
+        if (!this.player1.isTurn)
+            this.player2.isTurn = true;
+        else
+            this.player1.isTurn = true;
     }
 
     constructor() { super('two player'); }

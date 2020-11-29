@@ -1,3 +1,4 @@
+import TwoPlayer from "../scenes/TwoPlayer.js";
 import TBGbtns from "./TBGbtns.js";
 
 // TODO finish Gather and Throw
@@ -7,10 +8,12 @@ export class Family extends Phaser.GameObjects.Group {
     /**@type {string} */
     action;
     /**@type {TBGbtns} */
-    btns
+    btns;
+    /**@type {Family} assigned in the scene after instancing */
+    opponent;
 
     /**
-     * @param {Phaser.Scene} scene 
+     * @param {TwoPlayer} scene 
      * @param {number} x 
      * @param {number} y
      * @param {string} texture
@@ -46,6 +49,7 @@ export class Family extends Phaser.GameObjects.Group {
     }
 
     buildAction() {
+        // wall building is in wall
         this.children.iterate((e, ix) => {
             if (ix % 2 !== 0 && e.wallHeight < 4)
                 e.setInteractive()
@@ -61,7 +65,7 @@ export class Family extends Phaser.GameObjects.Group {
             targets: pet,
             duration: 1000,
             yoyo: true,
-            x: pet.x >= 70 ? -16 : this.scene.scale.width + 16,
+            x: pet.x === 120 ? -16 : this.scene.scale.width + 16,
             onStart: (twn, tgt) => {
                 tgt[0].setFlipX(true).setAnimToPlay(`build-${pet.texture.key}`);
             },
@@ -74,7 +78,7 @@ export class Family extends Phaser.GameObjects.Group {
                 this.children.entries[9].amount++;
                 console.log(this.children.entries[9].amount);
 
-                this.isTurn = true;
+                this.opponent.isTurn = true;
             }
         });
 
@@ -91,7 +95,7 @@ class Wall extends Phaser.Physics.Arcade.Image {
     family;
 
     /**
-     * @param {Phaser.Scene} scene 
+     * @param {TwoPlayer} scene 
      * @param {number} x 
      * @param {number} y 
      * @param {Family} fam
@@ -121,7 +125,7 @@ class Wall extends Phaser.Physics.Arcade.Image {
                 pet.setAnimToPlay(`build-${pet.texture.key}`);
                 this.scene.time.delayedCall(1500, () => {
                     pet.setAnimToPlay(`idle-${pet.texture.key}`);
-                    fam.isTurn = true;
+                    fam.opponent.isTurn = true;
                 });
 
                 console.log("PILE WAS CLICKED")
@@ -154,6 +158,14 @@ class FamilyMember extends Phaser.GameObjects.Sprite {
 
     preUpdate(t, dt) {
         this.play(`bounce-${this.texture.key}`, true);
+
+        if (this.health === 0)
+            this.scene.tweens.addCounter({
+                from: 1,
+                to: 0,
+                onUpdate: (twn) => { this.setAlpha(twn.getValue()); },
+                onComplete: () => { this.destroy(); }
+            });
 
         super.preUpdate(t, dt);
     }
