@@ -39,17 +39,17 @@ export class Family extends Phaser.GameObjects.Group {
         //DEBUG
         console.log('called throw method');
     }
-    
+
     buildAction() {
         this.children.iterate((e, ix) => {
             if (ix % 2 !== 0)
-            e.setInteractive()
+                e.setInteractive()
         });
 
         //DEBUG
         console.log('called build method');
     }
-    
+
     gatherAction() {
         const pet = this.children.entries[8];
         this.scene.tweens.add({
@@ -60,21 +60,19 @@ export class Family extends Phaser.GameObjects.Group {
             onStart: (twn, tgt) => {
                 tgt[0].setFlipX(true).setAnimToPlay(`build-${pet.texture.key}`);
             },
-            onYoyo: (twn, tgt) => { 
-                tgt.setFlipX(false); 
+            onYoyo: (twn, tgt) => {
+                tgt.setFlipX(false);
             },
             onComplete: (twn, tgt) => {
-                this.scene.time.delayedCall(1000, () => {
-                    tgt[0].setAnimToPlay(`idle-${pet.texture.key}`);
-                    
-                    this.children.entries[9].amount++;
-                    console.log(this.children.entries[9].amount);
-                    
-                    this.isTurn = true;
-                });
+                tgt[0].setAnimToPlay(`idle-${pet.texture.key}`);
+
+                this.children.entries[9].amount++;
+                console.log(this.children.entries[9].amount);
+
+                this.isTurn = true;
             }
         });
-        
+
         //DEBUG
         console.log('called gather method');
     }
