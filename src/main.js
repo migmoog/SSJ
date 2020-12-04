@@ -23,6 +23,7 @@ class P extends Phaser.Scene {
         this.load.spritesheet('wall', 'assets/images/wall.png', { frameWidth: 16, frameHeight: 32 });
         this.load.spritesheet('snowpile', 'assets/images/snowpile.png', { frameWidth: 32, frameHeight: 96 });
         this.load.image('arrow', 'assets/images/arrow.png');
+        this.load.image('snowball', 'assets/images/snowball.png');
 
         // UI preloads
         this.load.spritesheet('p1-btn', 'assets/images/p1-btn.png', { frameWidth: 48, frameHeight: 16 });
@@ -50,8 +51,18 @@ class P extends Phaser.Scene {
                 frameRate: 4
             });
             this.anims.create({
+                key: 'snowballmake-p1-' + s,
+                frames: this.anims.generateFrameNumbers(`p1-${s}`, { start: 3, end: 5 }),
+                frameRate: 4
+            });
+            this.anims.create({
                 key: 'bounce-p2-' + s,
                 frames: this.anims.generateFrameNumbers(`p2-${s}`, bounceConfig),
+                frameRate: 4
+            });
+            this.anims.create({
+                key: 'snowballmake-p2-' + s,
+                frames: this.anims.generateFrameNumbers(`p2-${s}`, { start: 3, end: 5 }),
                 frameRate: 4
             });
         }

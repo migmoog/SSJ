@@ -29,7 +29,7 @@ export class Family extends Phaser.GameObjects.Group {
 
         for (let i = 0; i < 4; i++)
             this.addMultiple([
-                new FamilyMember(scene, x, y + (i * 35), texture + i.toString()),
+                new FamilyMember(scene, x, y + (i * 35), texture + i.toString(), this),
                 new Wall(scene, x <= 70 ? x + 30 : x - 30, y + (i * 35), this)
             ], true);
 
@@ -44,6 +44,20 @@ export class Family extends Phaser.GameObjects.Group {
     }
 
     throwAction() {
+        this.opponent.children.iterate((e, ix) => {
+            if (ix % 2 === 0)
+                e.setInteractive()
+                    .on('pointerover', function() { this.setTint(0x5ee9e9); }, e)
+                    .on('pointerout', function() { this.clearTint(); }, e)
+                    .on('pointerdown', () => {
+                        this.children.entries[ix].play(`snowballmake-${this.children.entries[ix].texture.key}`);
+                        this.opponent.children.iterate((element, index) => {
+                            if (index % 2 === 0)
+                                element.disableInteractive();
+                        });
+                    });
+        });
+        
         //DEBUG
         console.log('called throw method');
     }
@@ -67,13 +81,11 @@ export class Family extends Phaser.GameObjects.Group {
             yoyo: true,
             x: pet.x === 120 ? -16 : this.scene.scale.width + 16,
             onStart: (twn, tgt) => {
-                tgt[0].setFlipX(true).setAnimToPlay(`build-${pet.texture.key}`);
+                tgt[0].setFlipX(true).setAnim(`build-${pet.texture.key}`);
             },
-            onYoyo: (twn, tgt) => {
-                tgt.setFlipX(false);
-            },
+            onYoyo: (twn, tgt) => { tgt.setFlipX(false); },
             onComplete: (twn, tgt) => {
-                tgt[0].setAnimToPlay(`idle-${pet.texture.key}`);
+                tgt[0].setAnim(`idle-${pet.texture.key}`);
 
                 this.children.entries[9].amount++;
                 console.log(this.children.entries[9].amount);
@@ -122,9 +134,9 @@ class Wall extends Phaser.Physics.Arcade.Image {
                         e.disableInteractive();
                 });
 
-                pet.setAnimToPlay(`build-${pet.texture.key}`);
+                pet.setAnim(`build-${pet.texture.key}`);
                 this.scene.time.delayedCall(1500, () => {
-                    pet.setAnimToPlay(`idle-${pet.texture.key}`);
+                    pet.setAnim(`idle-${pet.texture.key}`);
                     fam.opponent.isTurn = true;
                 });
 
@@ -151,9 +163,14 @@ class FamilyMember extends Phaser.GameObjects.Sprite {
      * @param {number} x 
      * @param {number} y 
      * @param {number} texture 
+     * @param {Family} fam
      */
-    constructor(scene, x, y, texture) {
+    constructor(scene, x, y, texture, fam) {
         super(scene, x, y, texture);
+
+        this.on(`animationcomplete-snowballmake-${texture}`, () => {
+            fam.add(scene.physics.add.image(x, y, 'snowball').setVelocityX(x < scene.scale.width / 2 ? 150 : -150), true);
+        });
     }
 
     preUpdate(t, dt) {
@@ -190,7 +207,7 @@ class Pet extends Phaser.GameObjects.Sprite {
         super.preUpdate(t, dt);
     }
 
-    setAnimToPlay(anim) {
+    setAnim(anim) {
         this.animToPlay = anim;
     }
 }
