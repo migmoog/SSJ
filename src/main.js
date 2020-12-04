@@ -33,10 +33,13 @@ class P extends Phaser.Scene {
         this.load.audio('battle theme', ['assets/music/battletheme.mp3']);
         this.load.audio('battle lost', ['assets/music/battlelost.mp3']);
 
+        // SFX
         this.load.audio('confirm', ['assets/sounds/confirm.mp3']);
         this.load.audio('cancel', ['assets/sounds/cancel.mp3']);
         this.load.audio('hoverbtn', ['assets/sounds/hoverbtn.mp3']);
         this.load.audio('snowballhit', ['assets/sounds/snowballhit.mp3']);
+        this.load.audio('snowballmake', ['assets/sounds/snowballmake.wav']);
+        this.load.audio('snowgather', ['assets/sounds/snowgather.wav']);
     }
 
     create() {

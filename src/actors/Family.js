@@ -169,7 +169,12 @@ class FamilyMember extends Phaser.GameObjects.Sprite {
         super(scene, x, y, texture);
 
         this.on(`animationcomplete-snowballmake-${texture}`, () => {
-            fam.add(scene.physics.add.image(x, y, 'snowball').setVelocityX(x < scene.scale.width / 2 ? 150 : -150), true);
+            scene.sound.play('snowballmake');
+            
+            fam.add(
+                scene.physics.add.image(x, y, 'snowball').setVelocityX(x < scene.scale.width / 2 ? 150 : -150), 
+                true
+            );
         });
     }
 

@@ -27,7 +27,7 @@ export default class TwoPlayer extends Phaser.Scene {
         });
     }
 
-    update(d, dt) {
+    update() {
         if (this.player1.isTurn) {
             this.player1.btns.makeButtons();
         } else if (this.player2.isTurn) {
