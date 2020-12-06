@@ -1,5 +1,6 @@
 import { Family } from "../actors/Family.js";
 
+//TODO finish snowball 
 export default class TwoPlayer extends Phaser.Scene {
     /**@type {Phaser.Sound.BaseSound} */
     music;
@@ -22,9 +23,8 @@ export default class TwoPlayer extends Phaser.Scene {
         this.player1.opponent = this.player2;
         this.player2.opponent = this.player1;
 
-        this.physics.add.overlap(this.player1, this.player2, () => {
-
-        });
+        this.physics.add.overlap(this.player1, this.player2);
+        this.physics.add.overlap(this.player2, this.player1);
     }
 
     update() {

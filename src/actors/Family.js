@@ -1,7 +1,6 @@
 import TwoPlayer from "../scenes/TwoPlayer.js";
 import TBGbtns from "./TBGbtns.js";
 
-// TODO finish Gather and Throw
 export class Family extends Phaser.GameObjects.Group {
     /**@type {boolean} */
     isTurn;
@@ -29,7 +28,7 @@ export class Family extends Phaser.GameObjects.Group {
 
         for (let i = 0; i < 4; i++)
             this.addMultiple([
-                new FamilyMember(scene, x, y + (i * 35), texture + i.toString(), this),
+                new FamilyMember(scene, x, y + (i * 35), texture + i.toString(), this, i),
                 new Wall(scene, x <= 70 ? x + 30 : x - 30, y + (i * 35), this)
             ], true);
 
@@ -47,8 +46,8 @@ export class Family extends Phaser.GameObjects.Group {
         this.opponent.children.iterate((e, ix) => {
             if (ix % 2 === 0)
                 e.setInteractive()
-                    .on('pointerover', function() { this.setTint(0x5ee9e9); }, e)
-                    .on('pointerout', function() { this.clearTint(); }, e)
+                    .on('pointerover', function () { this.setTint(0x5ee9e9); }, e)
+                    .on('pointerout', function () { this.clearTint(); }, e)
                     .on('pointerdown', () => {
                         this.children.entries[ix].play(`snowballmake-${this.children.entries[ix].texture.key}`);
                         this.opponent.children.iterate((element, index) => {
@@ -57,7 +56,7 @@ export class Family extends Phaser.GameObjects.Group {
                         });
                     });
         });
-        
+
         //DEBUG
         console.log('called throw method');
     }
@@ -65,6 +64,7 @@ export class Family extends Phaser.GameObjects.Group {
     buildAction() {
         // wall building is in wall
         this.children.iterate((e, ix) => {
+            // Wall building is in each instance of Wall
             if (ix % 2 !== 0 && e.wallHeight < 4)
                 e.setInteractive()
         });
@@ -99,7 +99,6 @@ export class Family extends Phaser.GameObjects.Group {
     }
 }
 
-//TODO add choices of value increase for walls
 class Wall extends Phaser.Physics.Arcade.Image {
     /**@type {number} */
     wallHeight = 0;
@@ -114,6 +113,7 @@ class Wall extends Phaser.Physics.Arcade.Image {
      */
     constructor(scene, x, y, fam) {
         super(scene, x, y, 'wall', 0);
+        scene.physics.add.existing(this);
 
         this.family = fam;
 
@@ -124,11 +124,14 @@ class Wall extends Phaser.Physics.Arcade.Image {
                 const pile = fam.children.entries[9];
                 this.scene.sound.play('confirm');
 
+                // Wall
                 this.wallHeight++;
-                console.log(this.wallHeight);
+                console.log("Wall's height", this.wallHeight);
+                // Pile
                 pile.amount--;
-                console.log(pile.amount);
+                console.log('Pile Amount', pile.amount);
 
+                // Changes the walls back to being unclickable
                 fam.children.iterate((e, ix) => {
                     if (ix % 2 !== 0)
                         e.disableInteractive();
@@ -151,10 +154,15 @@ class Wall extends Phaser.Physics.Arcade.Image {
             this.wallHeight = 4;
         else if (this.wallHeight < 0)
             this.wallHeight = 0;
+
+        if ((this.body.touching.left || this.body.touching.left) && this.wallHeight !== 0) {
+            this.wallHeight--;
+            console.log(this.wallHeight);
+        }
     }
 }
 
-class FamilyMember extends Phaser.GameObjects.Sprite {
+class FamilyMember extends Phaser.Physics.Arcade.Sprite {
     /**@type {number} */
     health = 6;
 
@@ -165,16 +173,14 @@ class FamilyMember extends Phaser.GameObjects.Sprite {
      * @param {number} texture 
      * @param {Family} fam
      */
-    constructor(scene, x, y, texture, fam) {
+    constructor(scene, x, y, texture, fam, ix) {
         super(scene, x, y, texture);
+        scene.physics.add.existing(this);
 
         this.on(`animationcomplete-snowballmake-${texture}`, () => {
             scene.sound.play('snowballmake');
-            
-            fam.add(
-                scene.physics.add.image(x, y, 'snowball').setVelocityX(x < scene.scale.width / 2 ? 150 : -150), 
-                true
-            );
+            fam.add(new Snowball(scene, x, y, fam, ix), true);
+            scene.time.delayedCall(1500, () => { fam.opponent.isTurn = true; });
         });
     }
 
@@ -189,7 +195,45 @@ class FamilyMember extends Phaser.GameObjects.Sprite {
                 onComplete: () => { this.destroy(); }
             });
 
+        if (this.body.touching.left || this.body.touching.right) {
+            this.health--;
+            console.log(this.health);
+        }
+
         super.preUpdate(t, dt);
+    }
+}
+
+class Snowball extends Phaser.Physics.Arcade.Image {
+    /**@type {FamilyMember | Wall} */
+    target;
+
+    /**
+     * @param {TwoPlayer} scene 
+     * @param {number} x 
+     * @param {number} y 
+     * @param {Family} fam 
+     */
+    constructor(scene, x, y, fam, ix) {
+        super(scene, x, y, 'snowball');
+        scene.add.existing(this);
+        scene.physics.add.existing(this);
+
+        this.setVelocityX(x < scene.scale.width / 2 ? 150 : -150);
+        this.target = fam.opponent.children.entries[ix + 1].wallHeight === 0
+            ? fam.opponent.children.entries[ix]
+            : fam.opponent.children.entries[ix + 1]
+
+        console.log(this.target.texture.key);
+    }
+
+    preUpdate() {
+        const targetTouch = this.target.body.touching;
+        const touching = this.body.touching;
+        
+        if ((touching.right || touching.left) && (targetTouch.left || targetTouch.right)) {
+            this.destroy(true);
+        }
     }
 }
 
@@ -234,14 +278,13 @@ class SnowPile extends Phaser.GameObjects.Image {
     }
 
     returnFrame(amnt) {
-        if (amnt <= 15) {
+        if (amnt <= 15)
             return 3;
-        } else if (amnt <= 10) {
+        else if (amnt <= 10)
             return 2;
-        } else if (amnt <= 5) {
+        else if (amnt <= 5)
             return 1;
-        } else if (amnt === 0) {
+        else if (amnt === 0)
             return 0;
-        }
     }
 }
