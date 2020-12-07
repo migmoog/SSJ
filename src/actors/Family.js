@@ -11,6 +11,11 @@ export class Family extends Phaser.GameObjects.Group {
     /**@type {Family} assigned in the scene after instancing */
     opponent;
 
+    /**@type {Wall[]} */
+    walls = [];
+    /**@type {FamilyMember[]} */
+    famMems = [];
+
     /**
      * @param {TwoPlayer} scene 
      * @param {number} x 
@@ -26,11 +31,15 @@ export class Family extends Phaser.GameObjects.Group {
         this.isTurn = isTurn;
         this.btns = new TBGbtns(scene, this, `${texture}btn`);
 
-        for (let i = 0; i < 4; i++)
+        for (let i = 0; i < 4; i++) {
+            this.famMems.push(new FamilyMember(scene, x, y + (i * 35), texture + i.toString(), this, i));
+            this.walls.push(new Wall(scene, x <= 70 ? x + 30 : x - 30, y + (i * 35), this));
+
             this.addMultiple([
-                new FamilyMember(scene, x, y + (i * 35), texture + i.toString()),
-                new Wall(scene, x <= 70 ? x + 30 : x - 30, y + (i * 35), this)
+                this.famMems[i],
+                this.walls[i]
             ], true);
+        }
 
         this.addMultiple([
             new Pet(scene, petX, 95, petTexture),
@@ -49,13 +58,12 @@ export class Family extends Phaser.GameObjects.Group {
                     .on('pointerover', function () { this.setTint(0x5ee9e9); }, e)
                     .on('pointerout', function () { this.clearTint(); }, e)
                     .on('pointerdown', () => {
-                        this.children.entries[ix].play(`snowballmake-${this.children.entries[ix].texture.key}`);
                         this.opponent.children.iterate((element, index) => {
                             if (index % 2 === 0)
                                 element.disableInteractive();
                         });
+
                         this.scene.sound.play('snowballmake');
-                        this.add(new Snowball(this.scene, this.children.entries[ix].x, this.children.entries[ix].y, e), true);
                         this.scene.time.delayedCall(1500, () => { this.opponent.isTurn = true; });
                     });
         });
@@ -148,11 +156,6 @@ class Wall extends Phaser.Physics.Arcade.Image {
             this.wallHeight = 4;
         else if (this.wallHeight < 0)
             this.wallHeight = 0;
-
-        if ((this.body.touching.left || this.body.touching.left) && this.wallHeight !== 0) {
-            this.wallHeight--;
-            console.log(this.wallHeight);
-        }
     }
 }
 
@@ -169,9 +172,19 @@ class FamilyMember extends Phaser.Physics.Arcade.Sprite {
      * @param {number} texture 
      * @param {Family} fam
      */
-    constructor(scene, x, y, texture) {
+    constructor(scene, x, y, texture, fam, ix) {
         super(scene, x, y, texture);
         scene.physics.add.existing(this);
+
+        this.on('pointerdown', () => {
+            // it's the opponent because you're clicking the target
+            fam.opponent.add(new Snowball(
+                scene,
+                fam.opponent.famMems[ix].x,
+                fam.opponent.famMems[ix].y,
+                fam.walls[ix].wallHeight === 0 ? this : fam.walls[ix]
+            ), true);
+        });
     }
 
     preUpdate(t, dt) {
@@ -184,11 +197,6 @@ class FamilyMember extends Phaser.Physics.Arcade.Sprite {
                 onUpdate: (twn) => { this.setAlpha(twn.getValue()); },
                 onComplete: (twn) => { this.family.killAndHide(this); }
             });
-
-        if (this.body.touching.left || this.body.touching.right) {
-            this.health--;
-            console.log(this.texture.key, this.health);
-        }
 
         super.preUpdate(t, dt);
     }
@@ -209,6 +217,7 @@ class Snowball extends Phaser.Physics.Arcade.Image {
         scene.add.existing(this);
         scene.physics.add.existing(this);
 
+        this.body.setSize(4, 4, true);
         this.setVelocityX(x < scene.scale.width / 2 ? 150 : -150);
         this.target = target;
     }
@@ -218,7 +227,15 @@ class Snowball extends Phaser.Physics.Arcade.Image {
         const touching = this.body.touching;
 
         if ((touching.right || touching.left) && (targetTouch.left || targetTouch.right)) {
-            this.destroy(true);
+            if (this.target.texture.key === 'wall') {
+                this.target.wallHeight--;
+                console.log(this.target.texture.key, this.target.wallHeight);
+                this.destroy(true);
+            } else {
+                this.target.health--;
+                console.log(this.target.texture.key, this.target.health);
+                this.destroy(true);
+            }
         }
     }
 }
