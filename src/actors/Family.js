@@ -28,7 +28,7 @@ export class Family extends Phaser.GameObjects.Group {
 
         for (let i = 0; i < 4; i++)
             this.addMultiple([
-                new FamilyMember(scene, x, y + (i * 35), texture + i.toString(), this, i),
+                new FamilyMember(scene, x, y + (i * 35), texture + i.toString()),
                 new Wall(scene, x <= 70 ? x + 30 : x - 30, y + (i * 35), this)
             ], true);
 
@@ -44,7 +44,7 @@ export class Family extends Phaser.GameObjects.Group {
 
     throwAction() {
         this.opponent.children.iterate((e, ix) => {
-            if (ix % 2 === 0)
+            if (ix % 2 === 0 && (e.texture.key !== 'cat' && e.texture.key !== 'dog'))
                 e.setInteractive()
                     .on('pointerover', function () { this.setTint(0x5ee9e9); }, e)
                     .on('pointerout', function () { this.clearTint(); }, e)
@@ -54,11 +54,11 @@ export class Family extends Phaser.GameObjects.Group {
                             if (index % 2 === 0)
                                 element.disableInteractive();
                         });
+                        this.scene.sound.play('snowballmake');
+                        this.add(new Snowball(this.scene, this.children.entries[ix].x, this.children.entries[ix].y, e), true);
+                        this.scene.time.delayedCall(1500, () => { this.opponent.isTurn = true; });
                     });
         });
-
-        //DEBUG
-        console.log('called throw method');
     }
 
     buildAction() {
@@ -68,9 +68,6 @@ export class Family extends Phaser.GameObjects.Group {
             if (ix % 2 !== 0 && e.wallHeight < 4)
                 e.setInteractive()
         });
-
-        //DEBUG
-        console.log('called build method');
     }
 
     gatherAction() {
@@ -93,9 +90,6 @@ export class Family extends Phaser.GameObjects.Group {
                 this.opponent.isTurn = true;
             }
         });
-
-        //DEBUG
-        console.log('called gather method');
     }
 }
 
@@ -164,7 +158,9 @@ class Wall extends Phaser.Physics.Arcade.Image {
 
 class FamilyMember extends Phaser.Physics.Arcade.Sprite {
     /**@type {number} */
-    health = 6;
+    health = 4;
+    /**@type {Family} */
+    family;
 
     /**
      * @param {Phaser.Scene} scene 
@@ -173,15 +169,9 @@ class FamilyMember extends Phaser.Physics.Arcade.Sprite {
      * @param {number} texture 
      * @param {Family} fam
      */
-    constructor(scene, x, y, texture, fam, ix) {
+    constructor(scene, x, y, texture) {
         super(scene, x, y, texture);
         scene.physics.add.existing(this);
-
-        this.on(`animationcomplete-snowballmake-${texture}`, () => {
-            scene.sound.play('snowballmake');
-            fam.add(new Snowball(scene, x, y, fam, ix), true);
-            scene.time.delayedCall(1500, () => { fam.opponent.isTurn = true; });
-        });
     }
 
     preUpdate(t, dt) {
@@ -192,12 +182,12 @@ class FamilyMember extends Phaser.Physics.Arcade.Sprite {
                 from: 1,
                 to: 0,
                 onUpdate: (twn) => { this.setAlpha(twn.getValue()); },
-                onComplete: () => { this.destroy(); }
+                onComplete: (twn) => { this.family.killAndHide(this); }
             });
 
         if (this.body.touching.left || this.body.touching.right) {
             this.health--;
-            console.log(this.health);
+            console.log(this.texture.key, this.health);
         }
 
         super.preUpdate(t, dt);
@@ -212,25 +202,21 @@ class Snowball extends Phaser.Physics.Arcade.Image {
      * @param {TwoPlayer} scene 
      * @param {number} x 
      * @param {number} y 
-     * @param {Family} fam 
+     * @param {Family} enemyFam 
      */
-    constructor(scene, x, y, fam, ix) {
+    constructor(scene, x, y, target) {
         super(scene, x, y, 'snowball');
         scene.add.existing(this);
         scene.physics.add.existing(this);
 
         this.setVelocityX(x < scene.scale.width / 2 ? 150 : -150);
-        this.target = fam.opponent.children.entries[ix + 1].wallHeight === 0
-            ? fam.opponent.children.entries[ix]
-            : fam.opponent.children.entries[ix + 1]
-
-        console.log(this.target.texture.key);
+        this.target = target;
     }
 
     preUpdate() {
         const targetTouch = this.target.body.touching;
         const touching = this.body.touching;
-        
+
         if ((touching.right || touching.left) && (targetTouch.left || targetTouch.right)) {
             this.destroy(true);
         }

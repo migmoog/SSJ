@@ -1,4 +1,5 @@
 import TwoPlayer from "./scenes/TwoPlayer.js";
+import TwoPlayerLost from "./scenes/TwoPlayerLost.js";
 
 class P extends Phaser.Scene {
     preload() {
@@ -100,7 +101,7 @@ class P extends Phaser.Scene {
 
 export default new Phaser.Game({
     type: Phaser.AUTO,
-    scene: [P, TwoPlayer],
+    scene: [P, TwoPlayer, TwoPlayerLost],
     scale: {
         width: 320,
         height: 180,

@@ -1,6 +1,5 @@
 import { Family } from "../actors/Family.js";
 
-//TODO finish snowball 
 export default class TwoPlayer extends Phaser.Scene {
     /**@type {Phaser.Sound.BaseSound} */
     music;
