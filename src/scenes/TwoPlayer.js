@@ -1,5 +1,6 @@
 import { Family } from "../actors/Family.js";
 
+// TODO some much needed UI
 export default class TwoPlayer extends Phaser.Scene {
     /**@type {Phaser.Sound.BaseSound} */
     music;
@@ -12,7 +13,7 @@ export default class TwoPlayer extends Phaser.Scene {
     player2;
 
     create() {
-        this.sound.add('battle theme', { loop: true, volume: 0.5 }).play();
+        this.sound.play('battle theme', { loop: true, volume: 0.5 });
 
         this.add.image(0, 0, 'bg').setOrigin(0, 0);
 

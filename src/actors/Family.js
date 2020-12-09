@@ -159,6 +159,7 @@ class Wall extends Phaser.Physics.Arcade.Image {
     }
 }
 
+//TODO add grave sprite so it's less weird when a famMem dies
 class FamilyMember extends Phaser.Physics.Arcade.Sprite {
     /**@type {number} */
     health = 4;
@@ -175,6 +176,8 @@ class FamilyMember extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, texture, fam, ix) {
         super(scene, x, y, texture);
         scene.physics.add.existing(this);
+
+        this.family = fam;
 
         this.on('pointerdown', () => {
             // it's the opponent because you're clicking the target
@@ -232,6 +235,7 @@ class Snowball extends Phaser.Physics.Arcade.Image {
                 console.log(this.target.texture.key, this.target.wallHeight);
                 this.destroy(true);
             } else {
+                this.scene.sound.play('snowballhit');
                 this.target.health--;
                 console.log(this.target.texture.key, this.target.health);
                 this.destroy(true);
