@@ -21,7 +21,6 @@ class P extends Phaser.Scene {
 
         // Snow preloads
         this.load.spritesheet('wall', 'assets/images/wall.png', { frameWidth: 16, frameHeight: 32 });
-        this.load.spritesheet('snowpile', 'assets/images/snowpile.png', { frameWidth: 32, frameHeight: 96 });
         this.load.image('arrow', 'assets/images/arrow.png');
         this.load.image('snowball', 'assets/images/snowball.png');
 
@@ -40,6 +39,9 @@ class P extends Phaser.Scene {
         this.load.audio('snowballhit', ['assets/sounds/snowballhit.mp3']);
         this.load.audio('snowballmake', ['assets/sounds/snowballmake.wav']);
         this.load.audio('snowgather', ['assets/sounds/snowgather.wav']);
+
+        // Text
+        this.load.bitmapFont('snowamount', 'assets/gloop_0.png', 'assets/gloop.fnt');
     }
 
     create() {
