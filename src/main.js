@@ -4,7 +4,6 @@ import TwoPlayerLost from "./scenes/TwoPlayerLost.js";
 class P extends Phaser.Scene {
     preload() {
         this.load.image('bg', 'assets/images/bg.png');
-        this.load.image('c', 'assets/images/c.png');
 
         // Family preloads
         for (let i = 0; i < 4; i++) {
@@ -55,18 +54,8 @@ class P extends Phaser.Scene {
                 frameRate: 4
             });
             this.anims.create({
-                key: 'snowballmake-p1-' + s,
-                frames: this.anims.generateFrameNumbers(`p1-${s}`, { start: 3, end: 5 }),
-                frameRate: 4
-            });
-            this.anims.create({
                 key: 'bounce-p2-' + s,
                 frames: this.anims.generateFrameNumbers(`p2-${s}`, bounceConfig),
-                frameRate: 4
-            });
-            this.anims.create({
-                key: 'snowballmake-p2-' + s,
-                frames: this.anims.generateFrameNumbers(`p2-${s}`, { start: 3, end: 5 }),
                 frameRate: 4
             });
         }
@@ -101,6 +90,7 @@ class P extends Phaser.Scene {
 
 export default new Phaser.Game({
     type: Phaser.AUTO,
+    title: 'Secret Santa Jam',
     scene: [P, TwoPlayer, TwoPlayerLost],
     scale: {
         width: 320,

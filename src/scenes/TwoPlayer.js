@@ -28,18 +28,13 @@ export default class TwoPlayer extends Phaser.Scene {
     }
 
     update() {
-        if (this.player1.isTurn) {
+        if (this.player1.isTurn)
             this.player1.btns.makeButtons();
-        } else if (this.player2.isTurn) {
+        else if (this.player2.isTurn)
             this.player2.btns.makeButtons();
-        }
-    }
 
-    changeTurn() {
-        if (!this.player1.isTurn)
-            this.player2.isTurn = true;
-        else
-            this.player1.isTurn = true;
+        if (this.player1.deadMems === 4 || this.player2.deadMems === 4)
+            this.scene.switch('two player lost');
     }
 
     constructor() { super('two player'); }

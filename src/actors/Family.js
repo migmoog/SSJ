@@ -14,7 +14,10 @@ export class Family extends Phaser.GameObjects.Group {
     /**@type {Wall[]} */
     walls = [];
     /**@type {FamilyMember[]} */
-    famMems = [];
+    mems = [];
+
+    /**@type {number} */
+    deadMems = 0;
 
     /**
      * @param {TwoPlayer} scene 
@@ -32,11 +35,11 @@ export class Family extends Phaser.GameObjects.Group {
         this.btns = new TBGbtns(scene, this, `${texture}btn`);
 
         for (let i = 0; i < 4; i++) {
-            this.famMems.push(new FamilyMember(scene, x, y + (i * 35), texture + i.toString(), this, i));
-            this.walls.push(new Wall(scene, x <= 70 ? x + 30 : x - 30, y + (i * 35), this));
+            this.mems.push(new FamilyMember(scene, x, y + (i * 35), texture + i.toString(), this, i));
+            this.walls.push(new Wall(scene, x <= 70 ? x + 30 : x - 30, y + (i * 35), this, i));
 
             this.addMultiple([
-                this.famMems[i],
+                this.mems[i],
                 this.walls[i]
             ], true);
         }
@@ -118,6 +121,7 @@ class Wall extends Phaser.Physics.Arcade.Image {
         scene.physics.add.existing(this);
 
         this.family = fam;
+        this.setBodySize(2);
 
         this.on('pointerover', () => { this.setTint(0x5ee9e9); })
             .on('pointerout', () => { this.clearTint(); })
@@ -145,7 +149,7 @@ class Wall extends Phaser.Physics.Arcade.Image {
                     fam.opponent.isTurn = true;
                 });
 
-                console.log("PILE WAS CLICKED")
+                console.log("PILE WAS CLICKED");
             });
     }
 
@@ -162,9 +166,13 @@ class Wall extends Phaser.Physics.Arcade.Image {
 //TODO add grave sprite so it's less weird when a famMem dies
 class FamilyMember extends Phaser.Physics.Arcade.Sprite {
     /**@type {number} */
-    health = 4;
+    health = 3;
+    /**@type {boolean} */
+    alive = true;
     /**@type {Family} */
     family;
+    /**@type {number} */
+    ix;
 
     /**
      * @param {Phaser.Scene} scene 
@@ -178,13 +186,15 @@ class FamilyMember extends Phaser.Physics.Arcade.Sprite {
         scene.physics.add.existing(this);
 
         this.family = fam;
+        this.ix = ix;
 
+        this.setBodySize(13);
         this.on('pointerdown', () => {
             // it's the opponent because you're clicking the target
             fam.opponent.add(new Snowball(
                 scene,
-                fam.opponent.famMems[ix].x,
-                fam.opponent.famMems[ix].y,
+                fam.opponent.mems[ix].x,
+                fam.opponent.mems[ix].y,
                 fam.walls[ix].wallHeight === 0 ? this : fam.walls[ix]
             ), true);
         });
@@ -193,13 +203,24 @@ class FamilyMember extends Phaser.Physics.Arcade.Sprite {
     preUpdate(t, dt) {
         this.play(`bounce-${this.texture.key}`, true);
 
-        if (this.health === 0)
+        if (this.health === 0 && this.alive) {
             this.scene.tweens.addCounter({
                 from: 1,
                 to: 0,
                 onUpdate: (twn) => { this.setAlpha(twn.getValue()); },
-                onComplete: (twn) => { this.family.killAndHide(this); }
+                onComplete: (twn) => { 
+                    this.family.killAndHide(this); 
+                    this.family.deadMems++;
+                    console.log(this.family.deadMems);
+                }
             });
+            
+            this.alive = false;
+        }
+
+        if (!this.alive) {
+            this.family.killAndHide(this.family.walls[this.ix]);
+        }
 
         super.preUpdate(t, dt);
     }
@@ -269,7 +290,7 @@ class Pet extends Phaser.GameObjects.Sprite {
 }
 
 class SnowPile extends Phaser.GameObjects.Image {
-    amount = 15;
+    amount = 4;
 
     /**
      * @param {Phaser.Scene} scn 
