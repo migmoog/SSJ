@@ -46,17 +46,13 @@ export class Family extends Phaser.GameObjects.Group {
 
         this.addMultiple([
             new Pet(scene, petX, 95, petTexture),
-            new SnowPile(scene, x <= 70 ? x - 50 : x + 50, 95)
+            new SnowAmount(scene, x <= 70 ? x - 50 : x + 50, 60)
         ], true);
-    }
-
-    preUpdate(t, dt) {
-        super.preUpdate(t, dt);
     }
 
     throwAction() {
         this.children.entries[9].amount--;
-        
+
         this.opponent.children.iterate((e, ix) => {
             if (ix % 2 === 0 && (e.texture.key !== 'cat' && e.texture.key !== 'dog'))
                 e.setInteractive()
@@ -166,6 +162,8 @@ class FamilyMember extends Phaser.Physics.Arcade.Sprite {
     alive = true;
     /**@type {Family} */
     family;
+    /**@type {Phaser.GameObjects.Image} */
+    hrt;
     /**@type {number} */
     ix;
 
@@ -173,7 +171,7 @@ class FamilyMember extends Phaser.Physics.Arcade.Sprite {
      * @param {Phaser.Scene} scene 
      * @param {number} x 
      * @param {number} y 
-     * @param {number} texture 
+     * @param {string} texture 
      * @param {Family} fam
      */
     constructor(scene, x, y, texture, fam, ix) {
@@ -182,6 +180,7 @@ class FamilyMember extends Phaser.Physics.Arcade.Sprite {
 
         this.family = fam;
         this.ix = ix;
+        this.hrt = scene.add.image(x <= scene.scale.width / 2 ? x + 15 : x - 15, y, `${texture.substr(0, 2)}-hrt`).setVisible(false);
 
         this.setBodySize(13);
         this.on('pointerdown', () => {
@@ -198,21 +197,26 @@ class FamilyMember extends Phaser.Physics.Arcade.Sprite {
     preUpdate(t, dt) {
         this.play(`bounce-${this.texture.key}`, true);
 
+        this.hrt.setFrame(this.health);
+        if (this.body.touching.left || this.body.touching.right) {
+            this.hrt.setVisible(true);
+            this.scene.time.delayedCall(1500, () => {
+                this.hrt.setVisible(false);
+            });
+        }
+
         if (this.health === 0 && this.alive) {
             this.scene.tweens.addCounter({
                 from: 1,
                 to: 0,
                 onUpdate: (twn) => { this.setAlpha(twn.getValue()); },
-                onComplete: (twn) => { 
-                    this.family.killAndHide(this); 
+                onComplete: (twn) => {
+                    this.family.killAndHide(this);
                     this.family.deadMems++;
                 }
             });
-            
-            this.alive = false;
-        }
 
-        if (!this.alive) {
+            this.alive = false;
             this.family.killAndHide(this.family.walls[this.ix]);
         }
 
@@ -281,7 +285,7 @@ class Pet extends Phaser.GameObjects.Sprite {
     }
 }
 
-class SnowPile extends Phaser.GameObjects.BitmapText {
+class SnowAmount extends Phaser.GameObjects.BitmapText {
     amount = 4;
 
     /**
@@ -291,7 +295,6 @@ class SnowPile extends Phaser.GameObjects.BitmapText {
      */
     constructor(scn, x, y) {
         super(scn, x, y, 'snowamount');
-
         this.setText(this.amount.toString()).setTint(0x180d2f);
     }
 

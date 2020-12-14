@@ -13,6 +13,8 @@ class P extends Phaser.Scene {
             this.load.spritesheet(`p1-${s}`, `assets/images/p1-${s}.png`, familyConfig);
             this.load.spritesheet(`p2-${s}`, `assets/images/p2-${s}.png`, familyConfig);
         }
+        this.load.spritesheet('p1-hrt', 'assets/images/p1-hrt.png', { frameWidth: 9, frameHeight: 9 });
+        this.load.spritesheet('p2-hrt', 'assets/images/p2-hrt.png', { frameWidth: 9, frameHeight: 9 });
 
         // Pet graphics preloads
         const petConfig = { frameWidth: 16, frameHeight: 16 };
@@ -42,6 +44,10 @@ class P extends Phaser.Scene {
 
         // Text
         this.load.bitmapFont('snowamount', 'assets/gloop_0.png', 'assets/gloop.fnt');
+
+        this.load.on('complete', () => {
+            this.scene.switch('two player');
+        })
     }
 
     create() {
@@ -83,8 +89,6 @@ class P extends Phaser.Scene {
             frames: this.anims.generateFrameNumbers('dog', { start: 3, end: 5 }),
             frameRate: 4
         });
-
-        this.scene.switch('two player');
     }
 
     constructor() { super('preload'); }
