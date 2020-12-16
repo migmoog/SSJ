@@ -90,8 +90,6 @@ class P extends Phaser.Scene {
             frameRate: 4
         });
     }
-
-    constructor() { super('preload'); }
 }
 
 export default new Phaser.Game({
