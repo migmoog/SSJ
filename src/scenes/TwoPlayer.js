@@ -33,8 +33,12 @@ export default class TwoPlayer extends Phaser.Scene {
         else if (this.player2.isTurn)
             this.player2.btns.makeButtons();
 
-        if (this.player1.deadMems === 4 || this.player2.deadMems === 4)
+        if (this.player1.deadMems === 4 || this.player2.deadMems === 4) {
+            this.player1.btns.children.iterate((e) => { this.player1.btns.killAndHide(e); })
+            this.player2.btns.children.iterate((e) => { this.player2.btns.killAndHide(e); })
+
             this.scene.switch('two player lost');
+        }
     }
 
     constructor() { super('two player'); }

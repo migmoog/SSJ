@@ -18,6 +18,8 @@ export class Family extends Phaser.GameObjects.Group {
 
     /**@type {number} */
     deadMems = 0;
+    /**@type {string} */
+    texture;
 
     /**
      * @param {TwoPlayer} scene 
@@ -32,6 +34,7 @@ export class Family extends Phaser.GameObjects.Group {
         super(scene);
 
         this.isTurn = isTurn;
+        this.texture = texture;
         this.btns = new TBGbtns(scene, this, `${texture}btn`);
 
         for (let i = 0; i < 4; i++) {
@@ -56,7 +59,7 @@ export class Family extends Phaser.GameObjects.Group {
         this.opponent.children.iterate((e, ix) => {
             if (ix % 2 === 0 && (e.texture.key !== 'cat' && e.texture.key !== 'dog'))
                 e.setInteractive()
-                    .on('pointerover', function () { this.setTint(0x5ee9e9); }, e)
+                    .on('pointerover', function () { this.setTint(this.texture === 'p1-' ? 0xda2424 : 0x5ee9e9); }, e)
                     .on('pointerout', function () { this.clearTint(); }, e)
                     .on('pointerdown', () => {
                         this.opponent.children.iterate((element, index) => {
@@ -119,7 +122,9 @@ class Wall extends Phaser.Physics.Arcade.Image {
         this.family = fam;
         this.setBodySize(2);
 
-        this.on('pointerover', () => { this.setTint(0x5ee9e9); })
+        this.on('pointerover', () => { 
+            this.setTint(fam.texture === 'p1-' ? 0x5ee9e9 : 0xda2424); 
+        })
             .on('pointerout', () => { this.clearTint(); })
             .on('pointerdown', () => {
                 const pet = fam.children.entries[8];

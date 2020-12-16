@@ -1,6 +1,6 @@
 export default class TwoPlayerLost extends Phaser.Scene {
     create() {
-        this.add.text(this.scale.width / 2, this.scale.height / 2, "Fuck we lost");
+        this.add.image(0, 0, 'end').setOrigin(0, 0);
     }
 
     update() {

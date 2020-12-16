@@ -4,6 +4,7 @@ import TwoPlayerLost from "./scenes/TwoPlayerLost.js";
 class P extends Phaser.Scene {
     preload() {
         this.load.image('bg', 'assets/images/bg.png');
+        this.load.image('end', 'assets/images/ssjending.png');
 
         // Family preloads
         for (let i = 0; i < 4; i++) {
@@ -104,7 +105,7 @@ export default new Phaser.Game({
     physics: {
         default: 'arcade',
         arcade: {
-            debug: true
+            // debug: true
         }
     }
 });
