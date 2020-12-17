@@ -10,6 +10,8 @@ export class Family extends Phaser.GameObjects.Group {
     btns;
     /**@type {Family} assigned in the scene after instancing */
     opponent;
+    /**@type {number} assigned in TBGbtns by ranges */
+    snowballAmount;
 
     /**@type {Wall[]} */
     walls = [];
@@ -54,7 +56,7 @@ export class Family extends Phaser.GameObjects.Group {
     }
 
     throwAction() {
-        this.children.entries[9].amount--;
+        this.children.entries[9].amount -= this.snowballAmount;
 
         this.opponent.children.iterate((e, ix) => {
             if (ix % 2 === 0 && (e.texture.key !== 'cat' && e.texture.key !== 'dog'))
@@ -194,7 +196,8 @@ class FamilyMember extends Phaser.Physics.Arcade.Sprite {
                 scene,
                 fam.opponent.mems[ix].x,
                 fam.opponent.mems[ix].y,
-                fam.walls[ix].wallHeight === 0 ? this : fam.walls[ix]
+                fam.walls[ix].wallHeight === 0 ? this : fam.walls[ix],
+                fam.opponent
             ), true);
         });
     }
@@ -232,14 +235,17 @@ class FamilyMember extends Phaser.Physics.Arcade.Sprite {
 class Snowball extends Phaser.Physics.Arcade.Image {
     /**@type {FamilyMember | Wall} */
     target;
+    /**@type {number} */
+    amount;
 
     /**
      * @param {TwoPlayer} scene 
      * @param {number} x 
      * @param {number} y 
-     * @param {Family} enemyFam 
+     * @param {FamilyMember | Wall} target
+     * @param {Family} fam 
      */
-    constructor(scene, x, y, target) {
+    constructor(scene, x, y, target, fam) {
         super(scene, x, y, 'snowball');
         scene.add.existing(this);
         scene.physics.add.existing(this);
@@ -247,6 +253,7 @@ class Snowball extends Phaser.Physics.Arcade.Image {
         this.body.setSize(4, 4, true);
         this.setVelocityX(x < scene.scale.width / 2 ? 150 : -150);
         this.target = target;
+        this.amount = fam.snowballAmount;
     }
 
     preUpdate() {
@@ -255,11 +262,11 @@ class Snowball extends Phaser.Physics.Arcade.Image {
 
         if ((touching.right || touching.left) && (targetTouch.left || targetTouch.right)) {
             if (this.target.texture.key === 'wall') {
-                this.target.wallHeight--;
+                this.target.wallHeight -= this.amount;
                 this.destroy(true);
             } else {
                 this.scene.sound.play('snowballhit');
-                this.target.health--;
+                this.target.health -= this.amount;
                 this.destroy(true);
             }
         }

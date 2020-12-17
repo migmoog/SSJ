@@ -33,11 +33,8 @@ export default class TBGbtns extends Phaser.GameObjects.Group {
                     targets: this.children.entries[i],
                     y: 40 + (i * 50)
                 });
-        }
-        else {
-            this.add(
-                new Btn(this.scene, this, this.family, this.scene.scale.width / 2, 196, this.buttonKey, 4)
-                , true);
+        } else {
+            this.add(new Btn(this.scene, this, this.family, this.scene.scale.width / 2, 196, this.buttonKey, 4), true);
 
             this.scene.tweens.add({
                 ease: Phaser.Math.Easing.Quadratic.InOut,
@@ -49,8 +46,83 @@ export default class TBGbtns extends Phaser.GameObjects.Group {
         this.family.isTurn = false;
     }
 
+    makeRanges() {
+        if (this.family.children.entries[9].amount > 1) {
+            const rng1 = new RangeNum(this.scene, this, this.family, this.scene.scale.width / 2 - 8, 196, this.family.texture, 1);
+            const rng2 = new RangeNum(this.scene, this, this.family, this.scene.scale.width / 2 + 8, 196, this.family.texture, 2);
+
+            this.addMultiple([rng1, rng2], true);
+            this.scene.tweens.add({
+                ease: Phaser.Math.Easing.Quadratic.InOut,
+                targets: [rng1, rng2],
+                y: this.scene.scale.height / 2
+            });
+        } else {
+            const rng1 = new RangeNum(this.scene, this, this.family, this.scene.scale.width / 2 + 4, 196, this.family.texture, 1);
+
+            this.add(rng1, true);
+            this.scene.tweens.add({
+                ease: Phaser.Math.Easing.Quadratic.InOut,
+                targets: [rng1],
+                y: this.scene.scale.height / 2
+            });
+        }
+
+        this.family.isTurn = false;
+    }
+
     preUpdate(t, dt) {
         super.preUpdate(t, dt);
+    }
+}
+
+class RangeNum extends Phaser.GameObjects.BitmapText {
+    tintChange;
+    amount;
+
+    /**
+     * @param {Phaser.Scene} scene 
+     * @param {TBGbtns} grp 
+     * @param {Family} fam 
+     * @param {number} x 
+     * @param {number} y 
+     * @param {string} texture 
+     * @param {number} num 
+     */
+    constructor(scene, grp, fam, x, y, texture, num) {
+        super(scene, x, y, 'snowamount', num.toString());
+
+        this.amount = num;
+
+        if (texture === 'p1-') {
+            this.tintChange = 0x5ee9e9;
+            this.setTint(this.tintChange);
+        } else if (texture === 'p2-') {
+            this.tintChange = 0xda2424;
+            this.setTint(this.tintChange);
+        }
+
+        this.setInteractive()
+            .on('pointerover', this.clearTint)
+            .on('pointerout', () => { this.setTint(this.tintChange); })
+            .on('pointerdown', () => {
+                grp.children.iterate((e, ix) => {
+                    e.disableInteractive();
+                    // tweens ALL buttons out of the scene
+                    scene.add.tween({
+                        duration: 500,
+                        ease: Phaser.Math.Easing.Quadratic.InOut,
+                        targets: e,
+                        y: 196,
+                        onComplete: (twn, tgt) => {
+                            tgt[0].destroy();
+                        }
+                    });
+                });
+
+                fam.snowballAmount = this.amount;
+                fam.throwAction();
+            });
     }
 }
 
@@ -119,7 +191,8 @@ class Btn extends Phaser.GameObjects.Image {
                 switch (this.action) {
                     case 'throw':
                         if (fam.children.entries[9].amount !== 0)
-                            fam.throwAction();
+                            grp.makeRanges();
+                        // fam.throwAction();
                         break;
                     case 'build':
                         if (fam.children.entries[9].amount !== 0)
