@@ -56,7 +56,8 @@ export class Family extends Phaser.GameObjects.Group {
     }
 
     throwAction() {
-        this.children.entries[9].amount -= this.snowballAmount;
+        if (this.snowballAmount !== 3)            
+            this.children.entries[9].amount -= this.snowballAmount;
 
         this.opponent.children.iterate((e, ix) => {
             if (ix % 2 === 0 && (e.texture.key !== 'cat' && e.texture.key !== 'dog'))
@@ -164,7 +165,7 @@ class Wall extends Phaser.Physics.Arcade.Image {
 
 class FamilyMember extends Phaser.Physics.Arcade.Sprite {
     /**@type {number} */
-    health = 3;
+    health = 4;
     /**@type {boolean} */
     alive = true;
     /**@type {Family} */
@@ -213,7 +214,7 @@ class FamilyMember extends Phaser.Physics.Arcade.Sprite {
             });
         }
 
-        if (this.health === 0 && this.alive) {
+        if (this.health <= 0 && this.alive) {
             this.scene.tweens.addCounter({
                 from: 1,
                 to: 0,

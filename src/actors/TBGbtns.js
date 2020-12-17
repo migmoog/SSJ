@@ -47,6 +47,8 @@ export default class TBGbtns extends Phaser.GameObjects.Group {
     }
 
     makeRanges() {
+        const bonus = Phaser.Math.Between(0, 6) === 0 ? 1 : 0
+
         if (this.family.children.entries[9].amount > 1) {
             const rng1 = new RangeNum(this.scene, this, this.family, this.scene.scale.width / 2 - 8, 196, this.family.texture, 1);
             const rng2 = new RangeNum(this.scene, this, this.family, this.scene.scale.width / 2 + 8, 196, this.family.texture, 2);
@@ -55,6 +57,15 @@ export default class TBGbtns extends Phaser.GameObjects.Group {
             this.scene.tweens.add({
                 ease: Phaser.Math.Easing.Quadratic.InOut,
                 targets: [rng1, rng2],
+                y: this.scene.scale.height / 2
+            });
+        } else if (bonus !== 0) {
+            const rng3 = new RangeNum(this.scene, this, this.family, this.scene.scale.width / 2 + 4, 196, this.family.texture, 3);
+
+            this.add(rng3, true);
+            this.scene.tweens.add({
+                ease: Phaser.Math.Easing.Quadratic.InOut,
+                targets: [rng3],
                 y: this.scene.scale.height / 2
             });
         } else {
@@ -94,13 +105,14 @@ class RangeNum extends Phaser.GameObjects.BitmapText {
 
         this.amount = num;
 
-        if (texture === 'p1-') {
+        if (num === 3) {
+            this.tintChange = 0xece910;
+        } else if (texture === 'p1-')
             this.tintChange = 0x5ee9e9;
-            this.setTint(this.tintChange);
-        } else if (texture === 'p2-') {
+        else if (texture === 'p2-')
             this.tintChange = 0xda2424;
-            this.setTint(this.tintChange);
-        }
+
+        this.setTint(this.tintChange);
 
         this.setInteractive()
             .on('pointerover', this.clearTint)
