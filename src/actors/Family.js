@@ -135,9 +135,10 @@ class Wall extends Phaser.Physics.Arcade.Image {
                 this.scene.sound.play('confirm');
 
                 // Wall
-                this.wallHeight++;
+                this.wallHeight += fam.snowballAmount;
                 // Pile
-                pile.amount--;
+                if (fam.snowballAmount !== 3)
+                    pile.amount -= fam.snowballAmount;
 
                 // Changes the walls back to being unclickable
                 fam.children.iterate((e, ix) => {

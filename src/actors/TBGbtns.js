@@ -133,7 +133,11 @@ class RangeNum extends Phaser.GameObjects.BitmapText {
                 });
 
                 fam.snowballAmount = this.amount;
-                fam.throwAction();
+                
+                if (grp.action === 'throw')
+                    fam.throwAction();
+                else if (grp.action === 'build')
+                    fam.buildAction();
             });
     }
 }
@@ -184,6 +188,7 @@ class Btn extends Phaser.GameObjects.Image {
             .on('pointerdown', () => {
                 scn.sound.play('confirm');
 
+                grp.action = this.action;
                 grp.children.iterate((e, ix) => {
                     e.disableInteractive();
                     // tweens ALL buttons out of the scene
@@ -208,7 +213,7 @@ class Btn extends Phaser.GameObjects.Image {
                         break;
                     case 'build':
                         if (fam.children.entries[9].amount !== 0)
-                            fam.buildAction();
+                            grp.makeRanges();
                         break;
                     case 'gather':
                         fam.gatherAction();
