@@ -56,7 +56,7 @@ export class Family extends Phaser.GameObjects.Group {
     }
 
     throwAction() {
-        if (this.snowballAmount !== 3)            
+        if (this.snowballAmount !== 3)
             this.children.entries[9].amount -= this.snowballAmount;
 
         this.opponent.children.iterate((e, ix) => {
@@ -109,6 +109,8 @@ export class Family extends Phaser.GameObjects.Group {
 class Wall extends Phaser.Physics.Arcade.Image {
     /**@type {number} */
     wallHeight = 0;
+    /**@type {number} */
+    ix;
     /**@type {Family} */
     family;
 
@@ -117,16 +119,18 @@ class Wall extends Phaser.Physics.Arcade.Image {
      * @param {number} x 
      * @param {number} y 
      * @param {Family} fam
+     * @param {number} ix index
      */
-    constructor(scene, x, y, fam) {
+    constructor(scene, x, y, fam, ix) {
         super(scene, x, y, 'wall', 0);
         scene.physics.add.existing(this);
 
         this.family = fam;
+        this.ix = ix;
         this.setBodySize(2);
 
-        this.on('pointerover', () => { 
-            this.setTint(fam.texture === 'p1-' ? 0x5ee9e9 : 0xda2424); 
+        this.on('pointerover', () => {
+            this.setTint(fam.texture === 'p1-' ? 0x5ee9e9 : 0xda2424);
         })
             .on('pointerout', () => { this.clearTint(); })
             .on('pointerdown', () => {
@@ -264,7 +268,20 @@ class Snowball extends Phaser.Physics.Arcade.Image {
 
         if ((touching.right || touching.left) && (targetTouch.left || targetTouch.right)) {
             if (this.target.texture.key === 'wall') {
-                this.target.wallHeight -= this.amount;
+                if (this.target.wallHeight - this.amount < 0) {
+                    this.target.wallHeight -= this.amount;
+                    
+                    // takes care of resolving health
+                    this.target.family.mems[this.target.ix].health -= Math.abs(this.target.wallHeight - this.amount) - this.amount;
+                    
+                    this.target.family.mems[this.target.ix].hrt.setVisible(true);
+                    this.scene.time.delayedCall(1500, () => {
+                        this.target.family.mems[this.target.ix].hrt.setVisible(false);
+                    });
+                } else {
+                    this.target.wallHeight -= this.amount;
+                }
+
                 this.destroy(true);
             } else {
                 this.scene.sound.play('snowballhit');
