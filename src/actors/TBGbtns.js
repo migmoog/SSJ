@@ -105,9 +105,9 @@ class RangeNum extends Phaser.GameObjects.BitmapText {
 
         this.amount = num;
 
-        if (num === 3) {
+        if (num === 3)
             this.tintChange = 0xece910;
-        } else if (texture === 'p1-')
+        else if (texture === 'p1-')
             this.tintChange = 0x1831a7;
         else if (texture === 'p2-')
             this.tintChange = 0xda2424;
