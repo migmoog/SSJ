@@ -21,12 +21,25 @@ export default class TBGbtns extends Phaser.GameObjects.Group {
     }
 
     makeButtons() {
-        if (this.family.children.entries[9].amount !== 0) {
+        if (this.family.children.entries[9].amount !== 0 && this.family.fullWalls === 4) {
+            this.addMultiple([
+                new Btn(this.scene, this, this.family, this.scene.scale.width / 2, 196, this.buttonKey, 0),
+                new Btn(this.scene, this, this.family, this.scene.scale.width / 2, 196, this.buttonKey, 4)
+            ], true);
+            
+            for (let i = 0; i < 3; i++)
+                this.scene.tweens.add({
+                    ease: Phaser.Math.Easing.Quadratic.InOut,
+                    targets: this.children.entries[i],
+                    y: 40 + (i * 50)
+                });
+        } else if (this.family.children.entries[9].amount !== 0) {
             this.addMultiple([
                 new Btn(this.scene, this, this.family, this.scene.scale.width / 2, 196, this.buttonKey, 0),
                 new Btn(this.scene, this, this.family, this.scene.scale.width / 2, 196, this.buttonKey, 2),
                 new Btn(this.scene, this, this.family, this.scene.scale.width / 2, 196, this.buttonKey, 4)
             ], true);
+            
             for (let i = 0; i < 3; i++)
                 this.scene.tweens.add({
                     ease: Phaser.Math.Easing.Quadratic.InOut,
@@ -133,7 +146,7 @@ class RangeNum extends Phaser.GameObjects.BitmapText {
                 });
 
                 fam.snowballAmount = this.amount;
-                
+
                 if (grp.action === 'throw')
                     fam.throwAction();
                 else if (grp.action === 'build')
