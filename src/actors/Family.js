@@ -167,13 +167,11 @@ class Wall extends Phaser.Physics.Arcade.Image {
 
         if (this.wallHeight === 4 && this.canCount) {
             this.family.fullWalls++;
-            console.log(this.family.fullWalls);
             this.canCount = false;
         }
 
         if (this.wallHeight < 4 && !this.canCount) {
             this.family.fullWalls--;
-            console.log(this.family.fullWalls);
             this.canCount = true;
         }
 
