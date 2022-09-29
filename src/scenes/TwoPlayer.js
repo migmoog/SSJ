@@ -17,10 +17,10 @@ export default class TwoPlayer extends Phaser.Scene {
 
         this.add.image(0, 0, 'bg').setOrigin(0, 0);
 
-        const whichTurn = !Phaser.Math.Between(0, 1) ? false : true;
+        const whichTurn = !Phaser.Math.Between(0, 1);
 
-        this.player1 = new Family(this, 70, 40, 'p1-', 'cat', 120, whichTurn ? true : false);
-        this.player2 = new Family(this, 250, 40, 'p2-', 'dog', 200, !whichTurn ? true : false);
+        this.player1 = new Family(this, 70, 40, 'p1-', 'cat', 120, whichTurn);
+        this.player2 = new Family(this, 250, 40, 'p2-', 'dog', 200, !whichTurn);
 
         this.player1.opponent = this.player2;
         this.player2.opponent = this.player1;
